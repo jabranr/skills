@@ -1,0 +1,50 @@
+name: Skills Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  skills-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Discover skills
+        id: discover
+        run: |
+          output=$(npm run --silent skills:list)
+          echo "$output"
+          discovered=$(printf '%s\n' "$output" | grep -c '^│    [a-z]' || true)
+          expected=$(find skills -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')
+          echo "discovered=$discovered" >> "$GITHUB_OUTPUT"
+          echo "expected=$expected" >> "$GITHUB_OUTPUT"
+
+      - name: Assert all skills discovered
+        env:
+          EXPECTED: ${{ steps.discover.outputs.expected }}
+          DISCOVERED: ${{ steps.discover.outputs.discovered }}
+        run: |
+          if [ "$DISCOVERED" != "$EXPECTED" ]; then
+            echo "::error::Expected $EXPECTED skills (from skills/*/SKILL.md), CLI discovered $DISCOVERED"
+            exit 1
+          fi
+          echo "All $DISCOVERED skills discovered."
+
