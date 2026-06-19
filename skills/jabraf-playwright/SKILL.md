@@ -63,14 +63,14 @@ will invoke this one.
 
    Option summary (from the README):
 
-   | Option         | Default                   | Notes                                          |
-   | -------------- | ------------------------- | ---------------------------------------------- |
-   | `testDir`      | `'./integration'`         | Where tests live                               |
-   | `isFunctional` | `false`                   | When `true`, starts dev/build server           |
-   | `isCI`         | `false`                   | Forbids `.only`, 2 retries, 1 worker           |
-   | `baseURL`      | `'http://localhost'`      | Used when `isFunctional` is `false`            |
-   | `devServerURL` | `'http://localhost'`      | Used when `isFunctional` is `true`             |
-   | `projects`     | Chromium (Desktop Chrome) | Override to add Firefox / WebKit / mobile     |
+   | Option         | Default                   | Notes                                     |
+   | -------------- | ------------------------- | ----------------------------------------- |
+   | `testDir`      | `'./integration'`         | Where tests live                          |
+   | `isFunctional` | `false`                   | When `true`, starts dev/build server      |
+   | `isCI`         | `false`                   | Forbids `.only`, 2 retries, 1 worker      |
+   | `baseURL`      | `'http://localhost'`      | Used when `isFunctional` is `false`       |
+   | `devServerURL` | `'http://localhost'`      | Used when `isFunctional` is `true`        |
+   | `projects`     | Chromium (Desktop Chrome) | Override to add Firefox / WebKit / mobile |
 
    Ask which directory the user wants for tests (`e2e`, `tests/e2e`, `integration`) and use that for `testDir`. **[wait for user if ambiguous]**
 
@@ -83,8 +83,8 @@ will invoke this one.
      "scripts": {
        "test:functional": "TEST_ENV=functional playwright test --grep-invert @non-functional",
        "test:e2e": "playwright test --grep @e2e",
-       "test:vr": "playwright test --grep @vr"
-     }
+       "test:vr": "playwright test --grep @vr",
+     },
    }
    ```
 
@@ -109,18 +109,17 @@ will invoke this one.
 
 ## Edge cases
 
-| Situation | Action |
-|---|---|
-| Project has no `package.json` | Stop. Ask the user to initialise the project first. |
-| Pure-Node lib with no browser surface | Stop per step 1. Suggest `jabraf-vitest` if they need unit tests instead. |
-| `playwright` already installed at a different major | Surface the version. Ask whether to align with `@jabraf/dev`. **[wait for user]** Do not auto-upgrade. |
-| Existing test runner (Cypress, WebdriverIO) | Do not migrate. Ask the user to decide before proceeding. |
-| User on Windows, asks to install browsers | `npx playwright install` works the same; skip `--with-deps` (Linux-only). |
-| User wants component testing (`@playwright/experimental-ct-*`) | Out of scope for the base factory. Tell the user to extend the config manually. |
-| Monorepo | Apply per-package. The factory is per-config-file; a workspace-level Playwright config is rare and out of scope. |
+| Situation                                                      | Action                                                                                                           |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Project has no `package.json`                                  | Stop. Ask the user to initialise the project first.                                                              |
+| Pure-Node lib with no browser surface                          | Stop per step 1. Suggest `jabraf-vitest` if they need unit tests instead.                                        |
+| `playwright` already installed at a different major            | Surface the version. Ask whether to align with `@jabraf/dev`. **[wait for user]** Do not auto-upgrade.           |
+| Existing test runner (Cypress, WebdriverIO)                    | Do not migrate. Ask the user to decide before proceeding.                                                        |
+| User on Windows, asks to install browsers                      | `npx playwright install` works the same; skip `--with-deps` (Linux-only).                                        |
+| User wants component testing (`@playwright/experimental-ct-*`) | Out of scope for the base factory. Tell the user to extend the config manually.                                  |
+| Monorepo                                                       | Apply per-package. The factory is per-config-file; a workspace-level Playwright config is rare and out of scope. |
 
 ## Reference
 
 - `@jabraf/dev` Playwright docs: [`packages/jabraf-dev/README.md#playwright`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/README.md#playwright)
 - Subpath export: `@jabraf/dev/playwright` → `./dist/config/playwright/base-config.js` (see [`packages/jabraf-dev/package.json`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/package.json) `exports` map)
-

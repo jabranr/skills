@@ -103,15 +103,15 @@ any granular `jabraf-*` skill in the same task — pick one or the other.
 
 ## Edge cases
 
-| Situation | Action |
-|---|---|
-| One or more granular skills missing | Stop on step 1. Show the install command. Do not partially proceed. |
-| Pure-Node library | Skip `jabraf-playwright` in step 3.5 with a one-line marker. Continue. |
-| User declines a step mid-flow | Skip that step, mark it as `skipped` in the final report, continue with the rest. |
-| User picks "leave alone" on an existing config in a granular skill | The granular skill records `kept-existing`. The umbrella forwards that status to the final report and continues. |
-| Monorepo (`workspaces` present) | Ask once on step 2: "Apply to the repo root, a specific workspace, or all workspaces?" **[wait for user]** Re-run the full sequence per chosen location. Do not interleave. |
-| User wants a subset (e.g. only Prettier + ESLint) | Stop. Tell them to use the granular skill(s) directly. The umbrella does not support partial sequencing. |
-| Granular skill not yet released for one of the tools | Skip that step and surface in the final report. Do not block on it. |
+| Situation                                                          | Action                                                                                                                                                                      |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| One or more granular skills missing                                | Stop on step 1. Show the install command. Do not partially proceed.                                                                                                         |
+| Pure-Node library                                                  | Skip `jabraf-playwright` in step 3.5 with a one-line marker. Continue.                                                                                                      |
+| User declines a step mid-flow                                      | Skip that step, mark it as `skipped` in the final report, continue with the rest.                                                                                           |
+| User picks "leave alone" on an existing config in a granular skill | The granular skill records `kept-existing`. The umbrella forwards that status to the final report and continues.                                                            |
+| Monorepo (`workspaces` present)                                    | Ask once on step 2: "Apply to the repo root, a specific workspace, or all workspaces?" **[wait for user]** Re-run the full sequence per chosen location. Do not interleave. |
+| User wants a subset (e.g. only Prettier + ESLint)                  | Stop. Tell them to use the granular skill(s) directly. The umbrella does not support partial sequencing.                                                                    |
+| Granular skill not yet released for one of the tools               | Skip that step and surface in the final report. Do not block on it.                                                                                                         |
 
 ## Reference
 
@@ -125,4 +125,3 @@ any granular `jabraf-*` skill in the same task — pick one or the other.
   - [`skills/jabraf-lint-staged`](../jabraf-lint-staged/SKILL.md)
 - `@jabraf/dev` umbrella README: [`packages/jabraf-dev/README.md`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/README.md)
 - Install all skills together: `npx skills add jabranr/skills -g -a <agent> --skill '*' -y`
-

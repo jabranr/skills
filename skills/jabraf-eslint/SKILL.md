@@ -60,8 +60,8 @@ require a user response.
    ```jsonc
    {
      "scripts": {
-       "lint": "eslint ."
-     }
+       "lint": "eslint .",
+     },
    }
    ```
 
@@ -85,18 +85,17 @@ require a user response.
 
 ## Edge cases
 
-| Situation | Action |
-|---|---|
-| Project has no `package.json` | Stop. Ask the user to initialise the project first (`npm init -y`). |
-| Both flat and legacy ESLint configs exist | Flag explicitly. The flat config (`eslint.config.*`) wins under ESLint 9+, but the legacy `.eslintrc*` will confuse editors and CI. Ask before deleting. |
-| Project uses ESLint < 9 | The base config is ESLint 9+ flat-config only. Warn the user that `@jabraf/dev`'s config requires ESLint 9+, and ask whether to upgrade. **[wait for user]** |
-| Monorepo (`workspaces` present) | Ask whether to add at the repo root, in a specific workspace, or both. **[wait for user]** Repeat steps 3–7 in each chosen location. |
-| Existing `.eslintignore` | Leave it alone. Note: flat config ignores live inside `eslint.config.*`; the base config's built-in ignores cover `dist`, `build`, `node_modules`. |
-| Network/install failure | Surface the package manager error verbatim and stop. Do not retry silently. |
+| Situation                                 | Action                                                                                                                                                       |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Project has no `package.json`             | Stop. Ask the user to initialise the project first (`npm init -y`).                                                                                          |
+| Both flat and legacy ESLint configs exist | Flag explicitly. The flat config (`eslint.config.*`) wins under ESLint 9+, but the legacy `.eslintrc*` will confuse editors and CI. Ask before deleting.     |
+| Project uses ESLint < 9                   | The base config is ESLint 9+ flat-config only. Warn the user that `@jabraf/dev`'s config requires ESLint 9+, and ask whether to upgrade. **[wait for user]** |
+| Monorepo (`workspaces` present)           | Ask whether to add at the repo root, in a specific workspace, or both. **[wait for user]** Repeat steps 3–7 in each chosen location.                         |
+| Existing `.eslintignore`                  | Leave it alone. Note: flat config ignores live inside `eslint.config.*`; the base config's built-in ignores cover `dist`, `build`, `node_modules`.           |
+| Network/install failure                   | Surface the package manager error verbatim and stop. Do not retry silently.                                                                                  |
 
 ## Reference
 
 - `@jabraf/dev` ESLint docs: [`packages/jabraf-dev/README.md#eslint`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/README.md#eslint)
 - Subpath export: `@jabraf/dev/eslint` → `./dist/config/code-linting/eslint.base.js` (see [`packages/jabraf-dev/package.json`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/package.json) `exports` map)
 - Both default and named (`baseEslintConfig`) exports are available.
-

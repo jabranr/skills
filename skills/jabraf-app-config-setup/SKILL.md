@@ -63,10 +63,10 @@ require a user response.
    import type { AppConfig, BuildAppConfig, EnvironmentConfig } from '@jabraf/app-config';
 
    const configByEnv: EnvironmentConfig<AppConfig> = {
-     dev:        { env: 'dev',        hostname: 'localhost:3000',           features: {} },
-     test:       { env: 'test',       hostname: 'test.example.com',         features: {} },
-     staging:    { env: 'staging',    hostname: 'staging.example.com',      features: {} },
-     production: { env: 'production', hostname: 'example.com',              features: {} },
+     dev: { env: 'dev', hostname: 'localhost:3000', features: {} },
+     test: { env: 'test', hostname: 'test.example.com', features: {} },
+     staging: { env: 'staging', hostname: 'staging.example.com', features: {} },
+     production: { env: 'production', hostname: 'example.com', features: {} },
    };
 
    export const buildAppConfig: BuildAppConfig = async (env) => configByEnv[env] ?? null;
@@ -112,8 +112,8 @@ require a user response.
        "config:build": "jabraf-config build",
        "config:watch": "jabraf-config build --watch",
        "prebuild": "jabraf-config build",
-       "predev": "jabraf-config build"
-     }
+       "predev": "jabraf-config build",
+     },
    }
    ```
 
@@ -156,17 +156,17 @@ require a user response.
 
 ## Edge cases
 
-| Situation | Action |
-|---|---|
-| Project has no `package.json` | Stop. Ask the user to initialise the project first. |
-| `config/` directory already contains unrelated files | Surface them. Ask whether `config/` is safe to extend, or whether to use a different directory name (note: the library's defaults assume `config/`). |
-| `make-config.ts` already exists with a different shape | Do not overwrite. Show the existing file and ask the user to decide. The library requires an exported `buildAppConfig`; flag if missing. |
-| Existing `FeatureMap` augmentation found elsewhere | Use that file. Do not write a new one. Add entries with consent. |
-| User on CommonJS Node (no `"type": "module"`) | Drop the `with { type: 'json' }` JSON import assertion. Note that `make-config.ts` is loaded via the `tsx` ESM loader at runtime regardless. |
-| First build fails with module resolution error for `tsx` | The `tsx` loader is bundled with `@jabraf/app-config`. Surface the raw error and stop. |
-| Monorepo (`workspaces` present) | Run the full sequence per workspace that needs config. Ask once on step 1 whether to apply at root, per-workspace, or both. **[wait for user]** Do not interleave. |
-| User wants per-environment overrides beyond the four supported envs (`dev`, `test`, `staging`, `production`) | Out of scope. Tell the user to compose their own switching logic inside `buildAppConfig`. |
-| User asks to wire the React `useFeature` hook into a specific component | Out of scope for setup. Mention the import path (`@jabraf/app-config/hooks/use-feature.js`) and let the user wire it themselves. |
+| Situation                                                                                                    | Action                                                                                                                                                             |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Project has no `package.json`                                                                                | Stop. Ask the user to initialise the project first.                                                                                                                |
+| `config/` directory already contains unrelated files                                                         | Surface them. Ask whether `config/` is safe to extend, or whether to use a different directory name (note: the library's defaults assume `config/`).               |
+| `make-config.ts` already exists with a different shape                                                       | Do not overwrite. Show the existing file and ask the user to decide. The library requires an exported `buildAppConfig`; flag if missing.                           |
+| Existing `FeatureMap` augmentation found elsewhere                                                           | Use that file. Do not write a new one. Add entries with consent.                                                                                                   |
+| User on CommonJS Node (no `"type": "module"`)                                                                | Drop the `with { type: 'json' }` JSON import assertion. Note that `make-config.ts` is loaded via the `tsx` ESM loader at runtime regardless.                       |
+| First build fails with module resolution error for `tsx`                                                     | The `tsx` loader is bundled with `@jabraf/app-config`. Surface the raw error and stop.                                                                             |
+| Monorepo (`workspaces` present)                                                                              | Run the full sequence per workspace that needs config. Ask once on step 1 whether to apply at root, per-workspace, or both. **[wait for user]** Do not interleave. |
+| User wants per-environment overrides beyond the four supported envs (`dev`, `test`, `staging`, `production`) | Out of scope. Tell the user to compose their own switching logic inside `buildAppConfig`.                                                                          |
+| User asks to wire the React `useFeature` hook into a specific component                                      | Out of scope for setup. Mention the import path (`@jabraf/app-config/hooks/use-feature.js`) and let the user wire it themselves.                                   |
 
 ## Reference
 
@@ -177,4 +177,3 @@ require a user response.
   - Node build: `@jabraf/app-config/build` (`buildConfig`, `appDirectory`, `fromRoot`)
 - CLI: `jabraf-config build [--watch | -w]` (build once; debounced watcher rebuilds on `config/` changes, ignores its own output file)
 - Companion skills in this repo: `jabraf-tsconfig` (ensures `resolveJsonModule`), `jabraf-dev-setup` (full `@jabraf/dev` stack — independent of app-config)
-

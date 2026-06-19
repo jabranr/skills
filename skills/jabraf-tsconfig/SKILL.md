@@ -51,7 +51,7 @@ the umbrella will invoke this one.
 
    ```jsonc
    {
-     "extends": "@jabraf/dev/tsconfig/<preset>"
+     "extends": "@jabraf/dev/tsconfig/<preset>",
    }
    ```
 
@@ -65,8 +65,8 @@ the umbrella will invoke this one.
    ```jsonc
    {
      "scripts": {
-       "typecheck": "tsc --noEmit"
-     }
+       "typecheck": "tsc --noEmit",
+     },
    }
    ```
 
@@ -86,17 +86,16 @@ the umbrella will invoke this one.
 
 ## Edge cases
 
-| Situation | Action |
-|---|---|
-| Project has no `package.json` | Stop. Ask the user to initialise the project first. |
-| Mixed signals (`next` AND a `bin` field, e.g.) | Surface both. Ask the user to pick. **[wait for user]** Default to whichever the user spends more time in (you can ask "Which one is the primary surface of this project?"). |
-| Monorepo (`workspaces` present) | Ask whether to apply at the root, in a specific workspace, or both. **[wait for user]** Repeat steps 3–7 in each location. Different workspaces may want different presets. |
-| User wants multiple `tsconfig.*.json` (e.g. `tsconfig.build.json`) | Offer to extend the per-file `extends` from `@jabraf/dev/tsconfig/<preset>` too. Confirm each file. |
-| `extends` is already an array (TS 5+) | Append the `@jabraf/dev` preset rather than replacing the array. Confirm before writing. |
-| Project uses `swc` / `esbuild` with no `tsc` step | Note that the typecheck script still has value for CI even when builds skip `tsc`. Don't add the script if the user declines. |
+| Situation                                                          | Action                                                                                                                                                                       |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Project has no `package.json`                                      | Stop. Ask the user to initialise the project first.                                                                                                                          |
+| Mixed signals (`next` AND a `bin` field, e.g.)                     | Surface both. Ask the user to pick. **[wait for user]** Default to whichever the user spends more time in (you can ask "Which one is the primary surface of this project?"). |
+| Monorepo (`workspaces` present)                                    | Ask whether to apply at the root, in a specific workspace, or both. **[wait for user]** Repeat steps 3–7 in each location. Different workspaces may want different presets.  |
+| User wants multiple `tsconfig.*.json` (e.g. `tsconfig.build.json`) | Offer to extend the per-file `extends` from `@jabraf/dev/tsconfig/<preset>` too. Confirm each file.                                                                          |
+| `extends` is already an array (TS 5+)                              | Append the `@jabraf/dev` preset rather than replacing the array. Confirm before writing.                                                                                     |
+| Project uses `swc` / `esbuild` with no `tsc` step                  | Note that the typecheck script still has value for CI even when builds skip `tsc`. Don't add the script if the user declines.                                                |
 
 ## Reference
 
 - `@jabraf/dev` TSConfig docs: [`packages/jabraf-dev/README.md#tsconfig`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/README.md#tsconfig)
 - Subpath exports: `@jabraf/dev/tsconfig/{base,lib,app,node}` — each maps to a JSON file under `./dist/config/typescript/` (see [`packages/jabraf-dev/package.json`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/package.json) `exports` map)
-

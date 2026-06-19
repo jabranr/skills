@@ -70,8 +70,8 @@ invoke this one.
    {
      "scripts": {
        "test": "vitest run",
-       "test:watch": "vitest"
-     }
+       "test:watch": "vitest",
+     },
    }
    ```
 
@@ -95,18 +95,17 @@ invoke this one.
 
 ## Edge cases
 
-| Situation | Action |
-|---|---|
-| Project has no `package.json` | Stop. Ask the user to initialise the project first. |
-| Vitest 1.x already installed at a pinned older version | Note that `@jabraf/dev`'s factory targets Vitest 4+. Ask whether to upgrade. **[wait for user]** Do not auto-upgrade. |
-| Project uses Jest | Do not migrate. Ask the user to decide before proceeding. Migration is out of scope. |
-| Monorepo with `vitest.workspace.ts` | Leave the workspace file alone. Apply this skill per-package. If the user wants a workspace-level config too, ask explicitly. **[wait for user]** |
-| `react: true` requested but no `react` in deps | Block. The factory's React setup imports `@testing-library/react`; without `react`/`react-dom`, tests will fail. Tell the user to install React first. |
-| Browser-mode Vitest | Out of scope for the base factory. If the user asks for browser mode, tell them to extend the config manually. |
-| Coverage flag set but no `@vitest/coverage-v8` resolved | The factory pulls coverage via Vitest 4's built-in provider; if a resolution error appears, surface it and stop. |
+| Situation                                               | Action                                                                                                                                                 |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Project has no `package.json`                           | Stop. Ask the user to initialise the project first.                                                                                                    |
+| Vitest 1.x already installed at a pinned older version  | Note that `@jabraf/dev`'s factory targets Vitest 4+. Ask whether to upgrade. **[wait for user]** Do not auto-upgrade.                                  |
+| Project uses Jest                                       | Do not migrate. Ask the user to decide before proceeding. Migration is out of scope.                                                                   |
+| Monorepo with `vitest.workspace.ts`                     | Leave the workspace file alone. Apply this skill per-package. If the user wants a workspace-level config too, ask explicitly. **[wait for user]**      |
+| `react: true` requested but no `react` in deps          | Block. The factory's React setup imports `@testing-library/react`; without `react`/`react-dom`, tests will fail. Tell the user to install React first. |
+| Browser-mode Vitest                                     | Out of scope for the base factory. If the user asks for browser mode, tell them to extend the config manually.                                         |
+| Coverage flag set but no `@vitest/coverage-v8` resolved | The factory pulls coverage via Vitest 4's built-in provider; if a resolution error appears, surface it and stop.                                       |
 
 ## Reference
 
 - `@jabraf/dev` Vitest docs: [`packages/jabraf-dev/README.md#vitest`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/README.md#vitest)
 - Subpath exports: `@jabraf/dev/vitest` (factory), `@jabraf/dev/vitest/react-setup` (setup file used internally when `react: true`) — see [`packages/jabraf-dev/package.json`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/package.json) `exports` map
-

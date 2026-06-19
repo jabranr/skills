@@ -66,8 +66,8 @@ unless the user also asks for commitlint. Do not load alongside
      ```jsonc
      {
        "simple-git-hooks": {
-         "commit-msg": "npx --no -- commitlint --edit \"$1\""
-       }
+         "commit-msg": "npx --no -- commitlint --edit \"$1\"",
+       },
      }
      ```
      and run `npx simple-git-hooks` once to register.
@@ -104,19 +104,18 @@ unless the user also asks for commitlint. Do not load alongside
 
 ## Edge cases
 
-| Situation | Action |
-|---|---|
-| Project has no `package.json` | Stop. Ask the user to initialise the project first. |
-| Project has no `.git` directory | Surface this. commitlint runs in a git context; offer to write the config anyway and skip the hook step. **[wait for user]** |
-| Husky already installed but no `commit-msg` hook | Add the hook file only; do not re-run `husky init`. |
-| User has both Husky and simple-git-hooks installed | Block and ask which one to use. Don't write conflicting hooks. |
-| Existing hook file already runs commitlint | Skip the write. Mention it in the final report. |
-| Hook needs to run a different commitlint package (e.g., monorepo with root + workspace commitlint configs) | Out of scope for this skill. Ask the user to wire the workspace-specific hook manually. |
-| Monorepo (`workspaces` present) | Ask whether to lint commits at the repo root (common) or per-workspace (rare). Default to root. **[wait for user]** |
+| Situation                                                                                                  | Action                                                                                                                       |
+| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Project has no `package.json`                                                                              | Stop. Ask the user to initialise the project first.                                                                          |
+| Project has no `.git` directory                                                                            | Surface this. commitlint runs in a git context; offer to write the config anyway and skip the hook step. **[wait for user]** |
+| Husky already installed but no `commit-msg` hook                                                           | Add the hook file only; do not re-run `husky init`.                                                                          |
+| User has both Husky and simple-git-hooks installed                                                         | Block and ask which one to use. Don't write conflicting hooks.                                                               |
+| Existing hook file already runs commitlint                                                                 | Skip the write. Mention it in the final report.                                                                              |
+| Hook needs to run a different commitlint package (e.g., monorepo with root + workspace commitlint configs) | Out of scope for this skill. Ask the user to wire the workspace-specific hook manually.                                      |
+| Monorepo (`workspaces` present)                                                                            | Ask whether to lint commits at the repo root (common) or per-workspace (rare). Default to root. **[wait for user]**          |
 
 ## Reference
 
 - `@jabraf/dev` commitlint docs: [`packages/jabraf-dev/README.md#commit-lint`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/README.md#commit-lint)
 - Subpath export: `@jabraf/dev/commitlint` → `./dist/config/code-linting/commit-lint.base.js` (see [`packages/jabraf-dev/package.json`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/package.json) `exports` map)
 - Conventional Commits spec: <https://www.conventionalcommits.org/>
-

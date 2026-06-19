@@ -59,4 +59,3 @@ option set.
 ## License
 
 MIT © Jabran Rafique
-
