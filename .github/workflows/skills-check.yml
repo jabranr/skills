@@ -16,10 +16,13 @@ permissions:
 jobs:
   skills-check:
     runs-on: ubuntu-latest
+    outputs:
+      discovered: ${{ steps.discover.outputs.discovered }}
+      expected: ${{ steps.discover.outputs.expected }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: 'npm'
