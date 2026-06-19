@@ -1,0 +1,17 @@
+{
+  "name": "@jabranr/skills",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Custom agent skills for personal development and productivity.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jabranr/skills.git"
+  },
+  "scripts": {
+    "skills:list": "skills add . --list"
+  },
+  "dependencies": {
+    "skills": "^1.5.12"
+  }
+}
