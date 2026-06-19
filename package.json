@@ -9,9 +9,16 @@
     "url": "git+https://github.com/jabranr/skills.git"
   },
   "scripts": {
-    "skills:list": "skills add . --list"
+    "skills:list": "skills add . --list",
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "prepare": "husky"
   },
   "dependencies": {
     "skills": "^1.5.12"
+  },
+  "devDependencies": {
+    "@jabraf/dev": "^0.1.1",
+    "husky": "^9.1.7"
   }
 }

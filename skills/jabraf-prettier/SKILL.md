@@ -33,7 +33,7 @@ require a user response before continuing.
 
 1. **Brief acknowledge.** One sentence: "I'll add Prettier via `@jabraf/dev`.
    That's: detect package manager, install the dep if missing, write
-   `.prettierrc.mjs`, add `format` / `format:fix` scripts, validate. Proceed?"
+   `.prettierrc.mjs`, add `format:check` / `format:fix` scripts, validate. Proceed?"
    **[wait for user]**
 
 2. **Detect package manager.** Look for the lockfile in the project root:
@@ -62,7 +62,7 @@ require a user response before continuing.
 
    ```jsonc
    {
-     "prettier": "@jabraf/dev/prettier"
+     "prettier": "@jabraf/dev/prettier",
    }
    ```
 
@@ -73,13 +73,13 @@ require a user response before continuing.
    ```jsonc
    {
      "scripts": {
-       "format": "prettier --check .",
-       "format:fix": "prettier --write ."
-     }
+       "format:check": "prettier --check .",
+       "format:fix": "prettier --write .",
+     },
    }
    ```
 
-7. **Validate.** Run `<pm> run format` (e.g. `npm run format`). Report the outcome:
+7. **Validate.** Run `<pm> run format:check` (e.g. `npm run format:check`). Report the outcome:
    - Exit 0: report "Prettier is set up and the codebase already matches the base config."
    - Non-zero with formatting diffs: report "Prettier is set up. `format:fix` will rewrite N file(s) to match the base config — run it when you're ready."
    - Non-zero with a different error (module not found, parse error): surface the error and stop.
@@ -96,24 +96,23 @@ require a user response before continuing.
 - Do not overwrite an existing Prettier config without explicit confirmation.
 - Do not overwrite existing `package.json` scripts without explicit confirmation.
 - Do not pin `@jabraf/dev` to a specific version — install at `latest`.
-- Do not run `format:fix` as part of setup. Validation runs `format` (read-only) only.
+- Do not run `format:fix` as part of setup. Validation runs `format:check` (read-only) only.
 - Do not edit any project files beyond `.prettierrc.mjs` (or the chosen variant) and `package.json` `scripts`.
 - Do not install Prettier itself as a direct dep — it comes as a transitive dep of `@jabraf/dev`.
 
 ## Edge cases
 
-| Situation | Action |
-|---|---|
-| Project has no `package.json` | Stop. Ask the user to initialise the project first (`npm init -y`). |
-| `package.json` `type` field is missing and you wrote `.prettierrc.mjs` | Confirm Node can load it (Node ≥ 14 with `.mjs` works regardless of `type`). No change needed; mention this in the final report. |
-| Monorepo (`workspaces` field present) | Ask whether to add Prettier at the repo root, in a specific workspace, or both. **[wait for user]** Repeat steps 3–7 in the chosen location(s). |
-| Existing `.prettierignore` | Leave it alone. The `@jabraf/dev` base config does not ship a `.prettierignore`; the user's existing one stays in effect. |
-| `@jabraf/dev` already pinned to an older version | Ask whether to upgrade to `latest`. **[wait for user]** Do not auto-upgrade. |
-| Network/install failure | Surface the package manager error verbatim and stop. Do not retry silently. |
+| Situation                                                              | Action                                                                                                                                          |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Project has no `package.json`                                          | Stop. Ask the user to initialise the project first (`npm init -y`).                                                                             |
+| `package.json` `type` field is missing and you wrote `.prettierrc.mjs` | Confirm Node can load it (Node ≥ 14 with `.mjs` works regardless of `type`). No change needed; mention this in the final report.                |
+| Monorepo (`workspaces` field present)                                  | Ask whether to add Prettier at the repo root, in a specific workspace, or both. **[wait for user]** Repeat steps 3–7 in the chosen location(s). |
+| Existing `.prettierignore`                                             | Leave it alone. The `@jabraf/dev` base config does not ship a `.prettierignore`; the user's existing one stays in effect.                       |
+| `@jabraf/dev` already pinned to an older version                       | Ask whether to upgrade to `latest`. **[wait for user]** Do not auto-upgrade.                                                                    |
+| Network/install failure                                                | Surface the package manager error verbatim and stop. Do not retry silently.                                                                     |
 
 ## Reference
 
 - `@jabraf/dev` Prettier docs: [`packages/jabraf-dev/README.md#prettier`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/README.md#prettier)
 - Subpath export: `@jabraf/dev/prettier` → `./dist/config/code-formatting/prettier.base.js` (see [`packages/jabraf-dev/package.json`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/package.json) `exports` map)
 - Both default and named (`basePrettierConfig`) exports are available; the README's default-import form is the canonical recommendation.
-
