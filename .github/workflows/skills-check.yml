@@ -32,10 +32,13 @@ jobs:
 
       - name: Discover skills
         id: discover
+        env:
+            NO_COLOR: '1'
+            FORCE_COLOR: '0'
         run: |
           output=$(npm run --silent skills:list)
           echo "$output"
-          discovered=$(printf '%s\n' "$output" | grep -c '^│    [a-z]' || true)
+          discovered=$(printf '%s\n' "$output" | sed 's/\x1b\[[0-9;]*m//g' | grep -c '^│    [a-z]' || true)
           expected=$(find skills -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')
           echo "discovered=$discovered" >> "$GITHUB_OUTPUT"
           echo "expected=$expected" >> "$GITHUB_OUTPUT"
