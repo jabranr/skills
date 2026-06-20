@@ -10,7 +10,7 @@ Skills follow the open [Agent Skills specification](https://agentskills.io)
 ([skills.md](https://skills.md)) — plain `SKILL.md` files with YAML frontmatter
 under `skills/<name>/`. They are installed with the
 [`skills` CLI](https://github.com/vercel-labs/skills) and work with any
-supported agent (Augment, Claude Code, Codex, Cursor, OpenCode, and others).
+supported agent (Claude Code, Codex, Cursor, OpenCode, and others).
 
 ## Layout
 
@@ -41,27 +41,28 @@ skills/
 ## Install
 
 Use the [`skills` CLI](https://github.com/vercel-labs/skills) — no clone, no
-runtime deps in this repo. Examples target Augment globally; swap `-a augment`
-for any [supported agent](https://github.com/vercel-labs/skills#supported-agents).
+runtime deps in this repo. Examples use `<agent>` as a placeholder; substitute
+any [supported agent](https://github.com/vercel-labs/skills#supported-agents)
+(e.g. `claude-code`, `codex`, `cursor`, `opencode`).
 
 ```bash
 # List available skills in this repo
 npx skills add jabranr/skills --list
 
-# Install everything to Augment (global)
-npx skills add jabranr/skills -g -a augment --skill '*' -y
+# Install everything (global)
+npx skills add jabranr/skills -g -a <agent> --skill '*' -y
 
 # Install one skill
-npx skills add jabranr/skills -g -a augment --skill jabraf-prettier -y
+npx skills add jabranr/skills -g -a <agent> --skill jabraf-prettier -y
 
 # Install one workflows skill
-npx skills add jabranr/skills -g -a augment --skill jabraf-workflows-pr-checks -y
+npx skills add jabranr/skills -g -a <agent> --skill jabraf-workflows-pr-checks -y
 
 # Install to multiple agents at once
-npx skills add jabranr/skills -g -a augment -a claude-code --skill jabraf-prettier -y
+npx skills add jabranr/skills -g -a <agent> -a claude-code --skill jabraf-prettier -y
 
-# Project-scoped install (writes into ./.augment/skills/)
-npx skills add jabranr/skills -a augment --skill jabraf-prettier -y
+# Project-scoped install (writes into the agent's project skills directory)
+npx skills add jabranr/skills -a <agent> --skill jabraf-prettier -y
 
 # Update / remove
 npx skills update jabraf-prettier
