@@ -46,16 +46,19 @@ require a user response before continuing.
 
 3. **Detect consumer context.** Read `package.json` once and probe:
 
-   | Input                    | Signal                                                                                             | Behaviour                                                             |
-   | ------------------------ | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-   | `node-version`           | `.nvmrc`, `volta.node`, or `engines.node`                                                          | Fall back to `24` if absent                                           |
-   | detected test-types      | `scripts["test:functional"]`, `scripts["test:e2e"]`, `scripts["test:smoke"]`, `scripts["test:vr"]` | **Emit one job per detected script.** If none, stop (see edge cases). |
-   | `timeout-minutes`        | (not detectable)                                                                                   | Accept default `60`                                                   |
-   | `reports-retention-days` | (not detectable)                                                                                   | Accept default `7`                                                    |
+   | Input                    | Signal                                                                                             | Behaviour                                                                                                                                                   |
+   | ------------------------ | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | `node-version`           | `.nvmrc`, `volta.node`, or `engines.node`                                                          | Fall back to `24` if absent                                                                                                                                 |
+   | detected test-types      | `scripts["test:functional"]`, `scripts["test:e2e"]`, `scripts["test:smoke"]`, `scripts["test:vr"]` | **Emit one job per detected script.** If none, stop (see edge cases).                                                                                       |
+   | `container-image`        | Presence of `Dockerfile`, `.devcontainer/`, or repo docs naming an image                           | Never guess; ask the user whether to run in a container and which image. Default empty (bare runner).                                                       |
+   | `run-setup-node`         | Derived from the `container-image` answer                                                          | Default `false` whenever the user picks any image; otherwise leave default (`true`).                                                                        |
+   | `run-playwright-install` | Derived from the `container-image` answer                                                          | If the image name suggests Playwright (e.g. starts with `mcr.microsoft.com/playwright`), propose `false`; otherwise leave default (`true`). Always confirm. |
+   | `timeout-minutes`        | (not detectable)                                                                                   | Accept default `60`                                                                                                                                         |
+   | `reports-retention-days` | (not detectable)                                                                                   | Accept default `7`                                                                                                                                          |
 
    If none of the four `test:<type>` scripts exist, stop and tell the user: "No Playwright test scripts (`test:functional`, `test:e2e`, `test:smoke`, `test:vr`) were found in `package.json`. Add at least one before wiring this workflow." **[wait for user]**
 
-4. **Single consolidated confirmation.** Present the detected `node-version` and the list of detected test-types as the jobs that will be emitted. Confirm or override. **[wait for user]**
+4. **Single consolidated confirmation.** Present the detected `node-version`, the list of detected test-types as the jobs that will be emitted, the chosen `container-image` (or "none"), and the resulting `run-setup-node` and `run-playwright-install` values. Confirm or override. **[wait for user]**
 
 5. **Write the caller YAML.** Default path: `.github/workflows/integration.yml`. If the path is occupied (and is not the existing caller surfaced in step 2), ask **replace / rename / abort**. **[wait for user if conflict]** Write the file with this body — **emit only the jobs for detected scripts**:
 
@@ -79,21 +82,37 @@ require a user response before continuing.
        with:
          node-version: <detected>
          test-type: functional
+         # Container options (omit for bare runner):
+         # container-image: mcr.microsoft.com/playwright:v1.55.0-noble
+         # run-setup-node: false
+         # run-playwright-install: false
      e2e:
        uses: jabranr/workflows/.github/workflows/reusable-integration.yml@main
        with:
          node-version: <detected>
          test-type: e2e
+         # Container options (omit for bare runner):
+         # container-image: mcr.microsoft.com/playwright:v1.55.0-noble
+         # run-setup-node: false
+         # run-playwright-install: false
      smoke:
        uses: jabranr/workflows/.github/workflows/reusable-integration.yml@main
        with:
          node-version: <detected>
          test-type: smoke
+         # Container options (omit for bare runner):
+         # container-image: mcr.microsoft.com/playwright:v1.55.0-noble
+         # run-setup-node: false
+         # run-playwright-install: false
      vr:
        uses: jabranr/workflows/.github/workflows/reusable-integration.yml@main
        with:
          node-version: <detected>
          test-type: vr
+         # Container options (omit for bare runner):
+         # container-image: mcr.microsoft.com/playwright:v1.55.0-noble
+         # run-setup-node: false
+         # run-playwright-install: false
      # Only emit the jobs whose `test:<type>` script exists.
    ```
 
@@ -120,6 +139,9 @@ Replace `<full-40-char-sha>` with the commit SHA from
 - Do not overwrite an existing `.github/workflows/integration.yml` without explicit confirmation.
 - Do not install Playwright on the user's behalf — the reusable workflow assumes the consumer's `test:<type>` script calls Playwright.
 - Do not commit, push, or open PRs at any step.
+- Do not set `run-setup-node: false` or `run-playwright-install: false` without also setting `container-image`. Both steps must run on a bare runner.
+- Do not infer `container-image` from filename heuristics. Always confirm the image string with the user.
+- Do not document image-name auto-detection. The workflow does not do this.
 
 ## Edge cases
 
