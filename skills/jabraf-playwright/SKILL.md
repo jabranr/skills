@@ -7,8 +7,12 @@ description: Set up Playwright in a project using `@jabraf/dev`'s `basePlaywrigh
 
 Adds Playwright to the current project via the `basePlaywrightConfig` factory
 from [`@jabraf/dev`](https://www.npmjs.com/package/@jabraf/dev). The factory
-accepts `{ testDir, isFunctional, isCI, baseURL, devServerURL, projects }` and
-ships sensible defaults for CI behaviour and browser projects (Chromium /
+covers test location (`testDir`, `testMatch`), target URLs (`baseURL`,
+`devServerURL`, `isFunctional`), CI behaviour (`isCI`, `retries`, `workers`,
+`fullyParallel`), reporting (`reporter`), browser `projects`, `use` options, and
+the auto web server (`webServerCommand`, `webServerEnv`, `webServerTimeout`,
+`webServer`). An `extend` escape hatch merges arbitrary Playwright config last.
+It ships sensible defaults for CI behaviour and browser projects (Chromium /
 Desktop Chrome by default).
 
 Canonical setup lives in
@@ -61,18 +65,32 @@ will invoke this one.
    });
    ```
 
-   Option summary (from the README):
+   Option summary:
 
-   | Option         | Default                   | Notes                                     |
-   | -------------- | ------------------------- | ----------------------------------------- |
-   | `testDir`      | `'./integration'`         | Where tests live                          |
-   | `isFunctional` | `false`                   | When `true`, starts dev/build server      |
-   | `isCI`         | `false`                   | Forbids `.only`, 2 retries, 1 worker      |
-   | `baseURL`      | `'http://localhost'`      | Used when `isFunctional` is `false`       |
-   | `devServerURL` | `'http://localhost'`      | Used when `isFunctional` is `true`        |
-   | `projects`     | Chromium (Desktop Chrome) | Override to add Firefox / WebKit / mobile |
+   | Option             | Default                     | Notes                                                    |
+   | ------------------ | --------------------------- | -------------------------------------------------------- |
+   | `testDir`          | `'./integration'`           | Where tests live                                         |
+   | `testMatch`        | Playwright default          | Glob(s) selecting spec files within `testDir`            |
+   | `isFunctional`     | `TEST_ENV === 'functional'` | When `true`, starts dev/build server                     |
+   | `isCI`             | `Boolean(process.env.CI)`   | Forbids `.only`; drives `retries` / `workers` defaults   |
+   | `baseURL`          | `'https://jabran.dev'`      | Used when `isFunctional` is `false`                      |
+   | `devServerURL`     | `'http://localhost:5231'`   | Used when `isFunctional` is `true`                       |
+   | `projects`         | Chromium (Desktop Chrome)   | Override to add Firefox / WebKit / mobile                |
+   | `reporter`         | `list` + non-opening `html` | Playwright reporter(s)                                   |
+   | `fullyParallel`    | `true`                      | Toggle full parallelism                                  |
+   | `retries`          | `2` on CI, else `0`         | Retry count                                              |
+   | `workers`          | `1` on CI, else unset       | Worker count                                             |
+   | `use`              | `{}`                        | Merged over computed `use` defaults (`baseURL`, `trace`) |
+   | `webServerCommand` | build+start on CI, else dev | Override the auto web-server command                     |
+   | `webServerEnv`     | —                           | Extra env vars for the auto web-server                   |
+   | `webServerTimeout` | `60000`                     | Timeout (ms) for the auto web-server                     |
+   | `webServer`        | derived (functional only)   | Fully override the web server; takes precedence          |
+   | `extend`           | `{}`                        | Escape hatch: extra config merged last, overriding all   |
 
-   Ask which directory the user wants for tests (`e2e`, `tests/e2e`, `integration`) and use that for `testDir`. **[wait for user if ambiguous]**
+   The web-server options only take effect for the functional suite unless you
+   pass a full `webServer` object. Ask which directory the user wants for tests
+   (`e2e`, `tests/e2e`, `integration`) and use that for `testDir`. **[wait for
+   user if ambiguous]**
 
 7. **Install Playwright browsers.** Run `npx playwright install` (or `--with-deps` if on Linux/CI). Mention that this downloads ~hundreds of MB. **[wait for user]** Skip if browsers are already installed.
 
@@ -116,10 +134,11 @@ will invoke this one.
 | `playwright` already installed at a different major            | Surface the version. Ask whether to align with `@jabraf/dev`. **[wait for user]** Do not auto-upgrade.           |
 | Existing test runner (Cypress, WebdriverIO)                    | Do not migrate. Ask the user to decide before proceeding.                                                        |
 | User on Windows, asks to install browsers                      | `npx playwright install` works the same; skip `--with-deps` (Linux-only).                                        |
-| User wants component testing (`@playwright/experimental-ct-*`) | Out of scope for the base factory. Tell the user to extend the config manually.                                  |
+| User wants component testing (`@playwright/experimental-ct-*`) | Out of scope for the base factory. Point them at the `extend` option to merge extra config, or extend manually.  |
 | Monorepo                                                       | Apply per-package. The factory is per-config-file; a workspace-level Playwright config is rare and out of scope. |
 
 ## Reference
 
 - `@jabraf/dev` Playwright docs: [`packages/jabraf-dev/README.md#playwright`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/README.md#playwright)
 - Subpath export: `@jabraf/dev/playwright` → `./dist/config/playwright/base-config.js` (see [`packages/jabraf-dev/package.json`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/package.json) `exports` map)
+- Named exports: `basePlaywrightConfig` (factory) and the `CustomPlaywrightTestConfig` options type.

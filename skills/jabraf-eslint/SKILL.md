@@ -8,7 +8,12 @@ description: Set up ESLint in a project using `@jabraf/dev`'s shared base config
 Adds ESLint to the current project by re-exporting `baseEslintConfig` from
 [`@jabraf/dev`](https://www.npmjs.com/package/@jabraf/dev). The base config
 auto-ignores `dist`, `build`, and `node_modules` and bundles recommended rules
-for JavaScript, TypeScript, and React.
+for JavaScript, TypeScript, React, and React Hooks (with React version
+auto-detection).
+
+For customisation (non-React projects, extra ignores, project rules, etc.) the
+package also exposes a `createBaseEslintConfig()` factory. `baseEslintConfig` is
+simply `createBaseEslintConfig()` with defaults.
 
 The canonical setup snippet lives in
 [`packages/jabraf-dev/README.md`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/README.md#eslint).
@@ -55,6 +60,30 @@ require a user response.
 
    Both default and named (`baseEslintConfig`) exports are available; the default form above matches the README.
 
+   For a non-React project, or to add ignores/rules on top of the base, use the
+   `createBaseEslintConfig()` factory instead:
+
+   ```ts
+   import { createBaseEslintConfig } from '@jabraf/dev/eslint';
+
+   export default createBaseEslintConfig({
+     react: false,
+     ignores: ['coverage'],
+     rules: { 'no-console': 'warn' },
+   });
+   ```
+
+   Factory options (all optional):
+
+   | Option    | Type                 | Default           | Notes                                                      |
+   | --------- | -------------------- | ----------------- | ---------------------------------------------------------- |
+   | `ignores` | `string[]`           | `[]`              | Extra globs appended to the built-in ignores               |
+   | `files`   | `string[]`           | all JS/TS/JSX/TSX | Globs the base JS/TS rules apply to                        |
+   | `react`   | `boolean`            | `true`            | Include React + React Hooks configs; `false` for non-React |
+   | `globals` | `Linter.Globals`     | `{}`              | Extra globals merged over browser + node                   |
+   | `rules`   | `Linter.RulesRecord` | `{}`              | Rules applied on top of the base config                    |
+   | `extend`  | `Config[]`           | `[]`              | Extra flat-config entries appended last                    |
+
 6. **Add scripts.** Add to `package.json` `scripts`, **only if absent**:
 
    ```jsonc
@@ -92,10 +121,12 @@ require a user response.
 | Project uses ESLint < 9                   | The base config is ESLint 9+ flat-config only. Warn the user that `@jabraf/dev`'s config requires ESLint 9+, and ask whether to upgrade. **[wait for user]** |
 | Monorepo (`workspaces` present)           | Ask whether to add at the repo root, in a specific workspace, or both. **[wait for user]** Repeat steps 3–7 in each chosen location.                         |
 | Existing `.eslintignore`                  | Leave it alone. Note: flat config ignores live inside `eslint.config.*`; the base config's built-in ignores cover `dist`, `build`, `node_modules`.           |
+| Non-React project                         | The base config enables React + React Hooks rules by default. Use `createBaseEslintConfig({ react: false })` to drop them.                                   |
 | Network/install failure                   | Surface the package manager error verbatim and stop. Do not retry silently.                                                                                  |
 
 ## Reference
 
 - `@jabraf/dev` ESLint docs: [`packages/jabraf-dev/README.md#eslint`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/README.md#eslint)
 - Subpath export: `@jabraf/dev/eslint` → `./dist/config/code-linting/eslint.base.js` (see [`packages/jabraf-dev/package.json`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/package.json) `exports` map)
-- Both default and named (`baseEslintConfig`) exports are available.
+- Exports: `createBaseEslintConfig` (factory) and `baseEslintConfig` (both named and default). `baseEslintConfig === createBaseEslintConfig()`.
+- React Hooks rules come from `eslint-plugin-react-hooks`, bundled by `@jabraf/dev`.
