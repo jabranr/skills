@@ -29,11 +29,6 @@ task touches a codebase.
   source or `--help` output. When something is unclear, say so and ask.
 - **Match the surroundings.** New code reads like the code next to it: structure,
   naming, comment density. Comments explain _why_.
-- **Close with a breakdown.** End every completed request with a table of the
-  share (%) and time taken by each part of the work:
-  - tools, MCPs, skills and processes used;
-  - the agent and model (name + version);
-  - anything else, by name where possible.
 
 ## 2. Orient in the repo (first coding step)
 
@@ -295,4 +290,3 @@ This file lists only what is specific to this repo and wins where the two differ
 - [ ] No secrets, generated files, local state or `ai-docs/` references staged.
 - [ ] Docs updated where behaviour, commands or setup changed.
 - [ ] Committed on a feature branch; nothing pushed unless asked.
-- [ ] Closing breakdown table included.
