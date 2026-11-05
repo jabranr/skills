@@ -1,9 +1,16 @@
 ---
 name: jabraf-workflows-actionlint
-description: Insert the `actionlint` composite action from `jabranr/workflows` as a step inside an existing workflow job to lint all `.github/workflows/*.yml` files (step-level `uses:`). Load when the user asks to lint GitHub Actions YAML, add `actionlint`, set up workflow validation, or wire `jabranr/workflows` actionlint. Do not load for creating a new top-level workflow file (that's a workflow skill).
+description: DEPRECATED — prefer `secureci validate` from `@secureci/cli` (see `jabraf-ground-rules` section 7). Insert the `actionlint` composite action from `jabranr/workflows` as a step inside an existing workflow job to lint all `.github/workflows/*.yml` files (step-level `uses:`). Load when the user asks to lint GitHub Actions YAML, add `actionlint`, set up workflow validation, or wire `jabranr/workflows` actionlint. Do not load for creating a new top-level workflow file (that's a workflow skill).
 ---
 
 # `jabraf-workflows-actionlint`
+
+> **Deprecated.** Prefer [`@secureci/cli`](https://www.npmjs.com/package/@secureci/cli)
+> for workflow checks: `secureci validate .github/workflows/*.yml` (validation),
+> `secureci run <workflow> --dry-run` (local runs) and `secureci inventory --check`
+> (action lockfile / drift). See `jabraf-ground-rules` section 7. Before step 1,
+> tell the user this and ask whether they still want `actionlint`; use this skill
+> only on a clear yes.
 
 Inserts the
 [`actionlint`](https://github.com/jabranr/workflows/tree/main/.github/actions/actionlint)

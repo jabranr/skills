@@ -1,6 +1,6 @@
 ---
 name: jabraf-ground-rules
-description: Jabran's ground rules for every project — how to work (clarify first, stay scoped, report real results) plus default TypeScript, testing, git/PR, gh, CI, security and docs conventions. Load at the start of any coding, repo, review, commit, PR or GitHub Actions task, and whenever a repo's AGENTS.md points to it or is silent on a convention.
+description: Jabran's ground rules for every project — how to work (clarify first, stay scoped, report real results) plus default stack (Cloudflare, Tailwind v4), TypeScript, testing, git/PR, gh, CI, security and docs conventions. Load at the start of any coding, repo, review, commit, PR or GitHub Actions task, and whenever a repo's AGENTS.md points to it or is silent on a convention.
 ---
 
 # `jabraf-ground-rules`
@@ -121,8 +121,27 @@ instruction, doc, README, AGENTS.md, PR and commit message you produce, with no
 - **Shared, single source:** types and validation schemas (e.g. Zod) live once in a
   shared module and are imported by client, server and DB.
 
+### Platform: Cloudflare for new projects
+
+New projects default to the Cloudflare stack, Workers first. Existing
+projects keep their platform; suggest a move only as a follow-up.
+
+- **Hosting and APIs:** Workers, with static assets for sites and SPAs. Keep
+  Pages only where a project already uses it.
+- **Data and state:** D1 (SQL), KV (config, cache), R2 (files), Queues
+  (background work), Durable Objects (coordination, realtime), picked to fit.
+- **Config and deploy:** `wrangler` with a committed `wrangler.jsonc`; types
+  from `wrangler types`; local dev via `wrangler dev`.
+- When a requirement doesn't fit Cloudflare (e.g. a long-running process or a
+  runtime it lacks), say so and ask before picking another platform.
+
 ### UI
 
+- **Styling: Tailwind CSS v4**, CSS-first: `@import "tailwindcss";` in the main
+  stylesheet, tokens in `@theme`, custom utilities via `@utility`, and no
+  `tailwind.config.js`. Wire it with `@tailwindcss/vite` (Vite projects) or
+  `@tailwindcss/postcss`. Repos on Tailwind v3 get "migrate Tailwind v3 → v4"
+  in your follow-ups list; leave the migration itself for an explicit ask.
 - Design tokens and shared primitives for colour, spacing and type; light and
   dark both work.
 - Accessible to WCAG 2.2 AA: labelled controls, visible focus, keyboard reachable,
@@ -210,7 +229,21 @@ tool manager chosen in section 2.
 - `fetch-depth: 0` on checkouts that run conventional-commit or versioning tools.
 - `HUSKY: 0` on steps that run `npm version` / `lerna version`.
 - Version tags are created by the publish workflow only.
-- Keep workflows valid under `actionlint`.
+- **Validate, run and inventory workflows with
+  [`@secureci/cli`](https://www.npmjs.com/package/@secureci/cli)** (`secureci`,
+  via `npx @secureci/cli` when not installed):
+  - `secureci validate .github/workflows/*.yml` — syntax, template injection,
+    token permissions, risky triggers; keep workflows passing it.
+  - `secureci run <workflow> --dry-run` (or a real local run) to try a workflow
+    before pushing.
+  - `secureci inventory` to lock actions in a committed `secureci.lock`;
+    `secureci inventory --check` in CI to fail on tag drift.
+  - `secureci pin` to rewrite action tags to commit SHAs (keeps the `# vX`
+    comment).
+- **`actionlint` is deprecated here.** Use `secureci validate` in new
+  workflows. Repos still running `actionlint` (incl. the `jabranr/workflows`
+  actionlint action) get "replace actionlint with `secureci validate`" in your
+  follow-ups list; swap it only when asked.
 
 ## 8. Security
 
