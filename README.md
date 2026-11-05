@@ -16,6 +16,9 @@ supported agent (Claude Code, Codex, Cursor, OpenCode, and others).
 
 ```
 skills/
+  # Baseline for every project
+  jabraf-ground-rules/SKILL.md         # common rules; repos point to it from AGENTS.md
+
   # @jabraf/dev tooling
   jabraf-prettier/SKILL.md
   jabraf-eslint/SKILL.md
@@ -37,6 +40,21 @@ skills/
   jabraf-workflows-wait-cf-pages/SKILL.md
   jabraf-workflows-performance-audit/SKILL.md
 ```
+
+## Using `jabraf-ground-rules` in a project
+
+`jabraf-ground-rules` is the single source of truth for the rules shared by every
+project. Install it globally, then open each repo's `AGENTS.md` with:
+
+```md
+## Baseline rules
+
+Follow the [`jabraf-ground-rules`](https://github.com/jabranr/skills/blob/main/skills/jabraf-ground-rules/SKILL.md)
+skill (install: `npx skills add jabranr/skills -g --skill jabraf-ground-rules`).
+This file lists only what is specific to this repo and wins where the two differ.
+```
+
+Keep repo docs to what is specific to that repo; change shared rules here.
 
 ## Install
 
