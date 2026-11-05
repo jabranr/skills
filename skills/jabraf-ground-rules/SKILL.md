@@ -41,19 +41,33 @@ Read the environment before writing code; it is the source of truth.
 
 1. Repo agent docs: `AGENTS.md`, `CLAUDE.md`, then the guide relevant to the task.
 2. `package.json` scripts, lockfile (`package-lock.json` → npm, `pnpm-lock.yaml`
-   → pnpm), Node pin (`volta` key / `.nvmrc`), default branch.
+   → pnpm), tool pins (`mise.toml` / `.mise.toml` / `.tool-versions`, `volta`
+   key, `.nvmrc`), default branch.
 3. Existing configs: `eslint.config.*`, `.prettierrc*`, `tsconfig*.json`,
    `vitest.config.*`, `playwright.config.*`, `.github/workflows/`.
 
 Done when you can name the repo's gate commands, package manager, Node version
 and default branch.
 
-### Node commands and Volta
+### Tool managers: mise, then Volta
 
-When `package.json` has a `volta` key, run Node-based commands through Volta
-(`volta run npm test`); otherwise run them directly. This is an execution rule
-only: write plain commands (`npm test`) in every instruction, doc, README,
-AGENTS.md, PR and commit message you produce.
+`mise` is the preferred tool manager; Volta is legacy. Pick the runner for
+Node-based commands in this order:
+
+1. **mise** — when `mise` is on `PATH` (`command -v mise`), run commands through
+   it: `mise exec -- npm test`. This applies even when the repo also has a
+   `volta` key.
+2. **Volta** — otherwise, when `package.json` has a `volta` key **and** `volta`
+   is on `PATH`, use `volta run npm test`.
+3. **Neither** — run commands directly: `npm test`.
+
+Repos still on Volta (a `volta` key and no `mise.toml` / `.mise.toml` /
+`.tool-versions`) get "migrate Volta → mise" in your follow-ups list; leave the
+migration itself for an explicit ask.
+
+Runners are an execution detail only: write plain commands (`npm test`) in every
+instruction, doc, README, AGENTS.md, PR and commit message you produce, with no
+`mise exec` or `volta run` prefix.
 
 ## 3. Code conventions (TypeScript / Node / React)
 
@@ -130,8 +144,8 @@ npm run lint && npm run format:check && npm run typecheck && npm test && npm run
 ```
 
 Add functional/e2e suites when UI or API flows changed, and any repo-specific
-checks (migrations, VR snapshots) its agent docs list. Apply the Volta rule in
-section 2 when running them.
+checks (migrations, VR snapshots) its agent docs list. Run them through the
+tool manager chosen in section 2.
 
 ## 6. Git and pull requests
 
