@@ -41,8 +41,8 @@ Read the environment before writing code; it is the source of truth.
 
 1. Repo agent docs: `AGENTS.md`, `CLAUDE.md`, then the guide relevant to the task.
 2. `package.json` scripts, lockfile (`package-lock.json` → npm, `pnpm-lock.yaml`
-   → pnpm), tool pins (`mise.toml` / `.mise.toml` / `.tool-versions`, `volta`
-   key, `.nvmrc`), default branch.
+   → pnpm), Node pin (`.node-version`, `engines.node`; legacy `volta` key or
+   `.nvmrc`), `mise.toml`, default branch.
 3. Existing configs: `eslint.config.*`, `.prettierrc*`, `tsconfig*.json`,
    `vitest.config.*`, `playwright.config.*`, `.github/workflows/`.
 
@@ -61,13 +61,30 @@ Node-based commands in this order:
    is on `PATH`, use `volta run npm test`.
 3. **Neither** — run commands directly: `npm test`.
 
-Repos still on Volta (a `volta` key and no `mise.toml` / `.mise.toml` /
-`.tool-versions`) get "migrate Volta → mise" in your follow-ups list; leave the
-migration itself for an explicit ask.
+Repos still on Volta (a `volta` key and no `.node-version`) get
+"migrate Volta → mise" in your follow-ups list; leave the migration itself for
+an explicit ask.
 
 Runners are an execution detail only: write plain commands (`npm test`) in every
 instruction, doc, README, AGENTS.md, PR and commit message you produce, with no
 `mise exec` or `volta run` prefix.
+
+### Node version: `.node-version` + `engines.node`
+
+- **`.node-version`** holds the exact Node pin (e.g. `24.11.1`). It is the one
+  source of truth for the version, read by mise, CI and other managers.
+- **`package.json` `engines.node`** states the supported minimum as a range from
+  that pin (e.g. `">=24.11.1"`).
+- **`mise.toml`** carries no `node` entry; mise reads `.node-version` as an
+  idiomatic version file. That reading is off by default since mise 2025.10, so
+  it needs `idiomatic_version_file_enable_tools = ["node"]` (global, or under
+  `[settings]` in the repo's `mise.toml`). Check with `mise exec -- node -v`: if
+  it doesn't match `.node-version`, report the mismatch rather than changing the
+  user's global mise config.
+- **Keep them in sync.** A Node bump updates `.node-version`, `engines.node` and
+  any CI `node-version` input together, in one change.
+- **Gaps are follow-ups.** A repo missing `.node-version` or `engines.node`, or
+  where they disagree, gets a follow-up entry; add or fix them only when asked.
 
 ## 3. Code conventions (TypeScript / Node / React)
 
@@ -188,6 +205,8 @@ tool manager chosen in section 2.
 - **Pin every action to a full commit SHA with the version as a comment:**
   `uses: actions/checkout@<40-char-sha> # v4.2.2`. Resolve the SHA from the
   action's tagged release rather than writing one from memory.
+- `actions/setup-node` reads the version from the repo:
+  `node-version-file: .node-version`.
 - `fetch-depth: 0` on checkouts that run conventional-commit or versioning tools.
 - `HUSKY: 0` on steps that run `npm version` / `lerna version`.
 - Version tags are created by the publish workflow only.
