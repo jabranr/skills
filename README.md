@@ -22,6 +22,7 @@ skills/
   # @jabraf/dev tooling
   jabraf-prettier/SKILL.md
   jabraf-eslint/SKILL.md
+  jabraf-oxlint/SKILL.md
   jabraf-tsconfig/SKILL.md
   jabraf-vitest/SKILL.md
   jabraf-playwright/SKILL.md
