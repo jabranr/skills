@@ -1,6 +1,6 @@
 ---
 name: jabraf-lint-staged
-description: Set up lint-staged in a project using `@jabraf/dev`'s shared base (runs Prettier on stage, then ESLint + related Vitest specs), wired through Husky for the `pre-commit` hook. Load when the user asks to add lint-staged, configure `.lintstagedrc`, set up a `pre-commit` hook for staged files, or wire up `@jabraf/dev` lint-staged specifically.
+description: Set up lint-staged in a project using `@jabraf/dev`'s shared base (runs Prettier on stage, then ESLint and/or oxlint + related Vitest specs), wired through Husky for the `pre-commit` hook. Load when the user asks to add lint-staged, configure `.lintstagedrc`, set up a `pre-commit` hook for staged files, or wire up `@jabraf/dev` lint-staged specifically.
 ---
 
 # `jabraf-lint-staged`
@@ -11,6 +11,9 @@ project by re-exporting `baseLintStagedConfig` from
 
 - `prettier --write` for staged `*.{js,mjs,ts,mts,jsx,tsx,md,yaml,yml,json,xml}`
 - `eslint` and `vitest run related --bail 0 --passWithNoTests` for staged `*.{js,ts,mjs,mts,jsx,tsx}`
+
+The linter is selectable via `createBaseLintStagedConfig({ linter })`:
+`'eslint'` (default), `'oxlint'`, or `'both'` (oxlint first, then eslint).
 
 Canonical setup lives in
 [`packages/jabraf-dev/README.md`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/README.md#lintstaged).
@@ -35,9 +38,10 @@ Do not load alongside `jabraf-dev-setup` — the umbrella will invoke this one.
 
 4. **Install `@jabraf/dev` if missing.** Dev dep, at `latest`. `lint-staged` itself comes transitively.
 
-5. **Pre-flight the base config's expectations.** The base config invokes `prettier`, `eslint`, and `vitest`. Verify each is reachable:
+5. **Pick the linter, then pre-flight.** Detect which linters the project has: `eslint.config.*` → ESLint; `oxlint.config.ts` / `.oxlintrc.json` → oxlint. Both → default `linter: 'both'`; only oxlint → `'oxlint'`; otherwise `'eslint'`. Confirm. **[wait for user if ambiguous]** The base config invokes `prettier`, the chosen linter(s), and `vitest`. Verify each is reachable:
    - Prettier — install `jabraf-prettier` if absent (or warn the user).
-   - ESLint — install `jabraf-eslint` if absent (or warn the user).
+   - ESLint (`'eslint'` / `'both'`) — install `jabraf-eslint` if absent (or warn the user).
+   - oxlint (`'oxlint'` / `'both'`) — install `jabraf-oxlint` if absent (or warn the user).
    - Vitest — install `jabraf-vitest` if absent (or warn the user).
 
    If any are missing, ask: "The base lint-staged config runs Prettier, ESLint, and Vitest. `<missing>` is not yet configured. Continue anyway (commands will fail until you set them up), set them up first via the related skill(s), or pick the compose path (`lintStagedCommands`)?" **[wait for user]**
@@ -50,6 +54,16 @@ Do not load alongside `jabraf-dev-setup` — the umbrella will invoke this one.
    export default baseLintStagedConfig;
    ```
 
+   With oxlint (`'oxlint'` or `'both'`):
+
+   ```js
+   import { createBaseLintStagedConfig } from '@jabraf/dev/lint-staged';
+
+   export default createBaseLintStagedConfig({ linter: 'both' });
+   ```
+
+   `createBaseLintStagedConfig` also takes `vitestExclude` (extra path substrings excluded from `vitest run related`, merged with the defaults `/playwright/`, `/integration/`, `/e2e/`, `/cypress/`).
+
    Compose path (only if the user wants a subset, e.g. eslint + tsc only):
 
    ```js
@@ -60,7 +74,7 @@ Do not load alongside `jabraf-dev-setup` — the umbrella will invoke this one.
    };
    ```
 
-   Available helpers: `lintStagedCommands.{eslint, tsc, vitest, prettier}`. Confirm the chosen variant. **[wait for user]**
+   Available helpers: `lintStagedCommands.{eslint, oxlint, tsc, vitest, prettier}`. Confirm the chosen variant. **[wait for user]**
 
 7. **Install Husky.** lint-staged does nothing on its own — it needs a `pre-commit` hook, and this skill standardises on [Husky](https://typicode.github.io/husky/). If Husky is already installed and initialised (`.husky/` exists), skip to step 8. Otherwise:
 
@@ -106,7 +120,7 @@ Do not load alongside `jabraf-dev-setup` — the umbrella will invoke this one.
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Project has no `package.json`                        | Stop. Ask the user to initialise the project first.                                                                                               |
 | Project has no `.git` directory                      | Surface this. Offer to write the config anyway and skip the Husky step. **[wait for user]**                                                       |
-| Prettier / ESLint / Vitest not yet configured        | Either install the matching `jabraf-*` skill flow first, or switch to the compose path with only the helpers that match installed tools.          |
+| Prettier / linter / Vitest not yet configured        | Either install the matching `jabraf-*` skill flow first, or switch to the compose path with only the helpers that match installed tools.          |
 | `simple-git-hooks` or `lefthook` already installed   | Block. Ask whether to replace with Husky or keep the existing manager (in which case skip Husky install and just wire the equivalent hook there). |
 | User already has a `prepare` script invoking Husky   | Leave it alone. Only adjust the `.husky/pre-commit` body.                                                                                         |
 | Existing `.husky/pre-commit` runs different commands | Show the diff and ask whether to append or replace. **[wait for user]**                                                                           |
@@ -116,4 +130,4 @@ Do not load alongside `jabraf-dev-setup` — the umbrella will invoke this one.
 
 - `@jabraf/dev` lint-staged docs: [`packages/jabraf-dev/README.md#lintstaged`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/README.md#lintstaged)
 - Subpath export: `@jabraf/dev/lint-staged` → `./dist/config/code-linting/lint-staged.base.js` (see [`packages/jabraf-dev/package.json`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/package.json) `exports` map)
-- Named exports: `baseLintStagedConfig` (default), `lintStagedCommands` ({ eslint, tsc, vitest, prettier })
+- Named exports: `baseLintStagedConfig` (default), `createBaseLintStagedConfig` ({ linter, vitestExclude }), `lintStagedCommands` ({ eslint, oxlint, tsc, vitest, prettier })

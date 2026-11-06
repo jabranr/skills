@@ -8,8 +8,13 @@ description: Set up ESLint in a project using `@jabraf/dev`'s shared base config
 Adds ESLint to the current project by re-exporting `baseEslintConfig` from
 [`@jabraf/dev`](https://www.npmjs.com/package/@jabraf/dev). The base config
 auto-ignores `dist`, `build`, and `node_modules` and bundles recommended rules
-for JavaScript, TypeScript, React, and React Hooks (with React version
-auto-detection).
+for JavaScript, TypeScript, React ([`@eslint-react`](https://eslint-react.xyz),
+with React version auto-detection), and React Hooks (`eslint-plugin-react-hooks`).
+It targets **ESLint 10** (flat config only).
+
+It can also run alongside [oxlint](https://oxc.rs/docs/guide/usage/linter):
+`createBaseEslintConfig({ oxlint: true })` turns off ESLint rules oxlint
+already covers. Oxlint itself is set up by the `jabraf-oxlint` skill.
 
 For customisation (non-React projects, extra ignores, project rules, etc.) the
 package also exposes a `createBaseEslintConfig()` factory. `baseEslintConfig` is
@@ -24,11 +29,14 @@ If this file and the README disagree, trust the README.
 Load when the user's prompt mentions any of:
 
 - "ESLint", "linting", "`eslint.config`"
-- "flat config", "ESLint 9"
+- "flat config", "ESLint 10", "upgrade ESLint"
+- "ESLint with oxlint", "run ESLint alongside oxlint"
 - "`@jabraf/dev` ESLint", "jabraf eslint"
 
-Do not load for non-ESLint static-analysis tools (Biome, Oxlint, etc.) or for
-general "fix my lint errors" requests that don't involve `@jabraf/dev`. Do not
+Do not load for non-ESLint static-analysis tools (Biome, etc.) or for general
+"fix my lint errors" requests that don't involve `@jabraf/dev`. For oxlint-only
+setup, load `jabraf-oxlint` instead; when the user wants both, load
+`jabraf-oxlint` after this skill. Do not
 load alongside `jabraf-dev-setup` — the umbrella will invoke this one.
 
 ## Conversation flow
@@ -43,7 +51,7 @@ require a user response.
 
 2. **Detect package manager.** `pnpm-lock.yaml` → pnpm; `yarn.lock` → yarn; `package-lock.json` → npm. If none, default to npm and say so. If multiple, ask. **[wait for user if ambiguous]**
 
-3. **Detect existing config.** Check for any of `eslint.config.{js,cjs,mjs,ts,mts,cts}`, `.eslintrc`, `.eslintrc.{js,cjs,json,yaml,yml}`, or an `eslintConfig` field in `package.json`. If found, show the contents and ask: "An existing ESLint config was found. Replace with the `@jabraf/dev` re-export, leave it alone, or keep both?" **[wait for user]** Never overwrite silently. Legacy `.eslintrc*` files conflict with the flat config from `@jabraf/dev` (ESLint 9+) — flag this if detected and recommend deleting after the user confirms.
+3. **Detect existing config.** Check for any of `eslint.config.{js,cjs,mjs,ts,mts,cts}`, `.eslintrc`, `.eslintrc.{js,cjs,json,yaml,yml}`, or an `eslintConfig` field in `package.json`. If found, show the contents and ask: "An existing ESLint config was found. Replace with the `@jabraf/dev` re-export, leave it alone, or keep both?" **[wait for user]** Never overwrite silently. Legacy `.eslintrc*` files are not supported by ESLint 10 and conflict with the flat config from `@jabraf/dev` — flag this if detected and recommend deleting after the user confirms.
 
 4. **Install `@jabraf/dev` if missing.** Check `dependencies` and `devDependencies` in `package.json`. If absent, install as a dev dep at `latest`:
    - npm: `npm install --save-dev @jabraf/dev`
@@ -75,14 +83,28 @@ require a user response.
 
    Factory options (all optional):
 
-   | Option    | Type                 | Default           | Notes                                                      |
-   | --------- | -------------------- | ----------------- | ---------------------------------------------------------- |
-   | `ignores` | `string[]`           | `[]`              | Extra globs appended to the built-in ignores               |
-   | `files`   | `string[]`           | all JS/TS/JSX/TSX | Globs the base JS/TS rules apply to                        |
-   | `react`   | `boolean`            | `true`            | Include React + React Hooks configs; `false` for non-React |
-   | `globals` | `Linter.Globals`     | `{}`              | Extra globals merged over browser + node                   |
-   | `rules`   | `Linter.RulesRecord` | `{}`              | Rules applied on top of the base config                    |
-   | `extend`  | `Config[]`           | `[]`              | Extra flat-config entries appended last                    |
+   | Option    | Type                      | Default           | Notes                                                        |
+   | --------- | ------------------------- | ----------------- | ------------------------------------------------------------ |
+   | `ignores` | `string[]`                | `[]`              | Extra globs appended to the built-in ignores                 |
+   | `files`   | `string[]`                | all JS/TS/JSX/TSX | Globs the base JS/TS rules apply to                          |
+   | `react`   | `boolean`                 | `true`            | Include React + React Hooks configs; `false` for non-React   |
+   | `globals` | `Linter.Globals`          | `{}`              | Extra globals merged over browser + node                     |
+   | `rules`   | `Linter.RulesRecord`      | `{}`              | Rules applied on top of the base config                      |
+   | `oxlint`  | `boolean \| OxlintConfig` | `false`           | Turn off ESLint rules oxlint covers (`eslint-plugin-oxlint`) |
+   | `extend`  | `Linter.Config[]`         | `[]`              | Extra flat-config entries appended after the base config     |
+
+   If the project also uses oxlint (or the user wants both), use:
+
+   ```ts
+   import { createBaseEslintConfig } from '@jabraf/dev/eslint';
+
+   export default createBaseEslintConfig({ oxlint: true });
+   ```
+
+   `oxlint: true` derives the rules to disable from the `@jabraf/dev/oxlint`
+   base config (respecting `react`). If the project has a custom oxlint config,
+   pass that object instead of `true`. The oxlint entries are appended last, so
+   a rule re-enabled via `rules`/`extend` that oxlint covers stays off.
 
 6. **Add scripts.** Add to `package.json` `scripts`, **only if absent**:
 
@@ -94,7 +116,8 @@ require a user response.
    }
    ```
 
-   If the user has source segregated under `src/`, propose `eslint src` instead. **[wait for user if conflict]**
+   If the user has source segregated under `src/`, propose `eslint src` instead.
+   When running alongside oxlint, use `"lint": "oxlint src && eslint src"` (oxlint first for fast feedback). **[wait for user if conflict]**
 
 7. **Validate.** Run `<pm> run lint`. Report the outcome:
    - Exit 0: "ESLint is set up and the codebase passes the base ruleset."
@@ -114,19 +137,22 @@ require a user response.
 
 ## Edge cases
 
-| Situation                                 | Action                                                                                                                                                       |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Project has no `package.json`             | Stop. Ask the user to initialise the project first (`npm init -y`).                                                                                          |
-| Both flat and legacy ESLint configs exist | Flag explicitly. The flat config (`eslint.config.*`) wins under ESLint 9+, but the legacy `.eslintrc*` will confuse editors and CI. Ask before deleting.     |
-| Project uses ESLint < 9                   | The base config is ESLint 9+ flat-config only. Warn the user that `@jabraf/dev`'s config requires ESLint 9+, and ask whether to upgrade. **[wait for user]** |
-| Monorepo (`workspaces` present)           | Ask whether to add at the repo root, in a specific workspace, or both. **[wait for user]** Repeat steps 3–7 in each chosen location.                         |
-| Existing `.eslintignore`                  | Leave it alone. Note: flat config ignores live inside `eslint.config.*`; the base config's built-in ignores cover `dist`, `build`, `node_modules`.           |
-| Non-React project                         | The base config enables React + React Hooks rules by default. Use `createBaseEslintConfig({ react: false })` to drop them.                                   |
-| Network/install failure                   | Surface the package manager error verbatim and stop. Do not retry silently.                                                                                  |
+| Situation                                 | Action                                                                                                                                                        |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Project has no `package.json`             | Stop. Ask the user to initialise the project first (`npm init -y`).                                                                                           |
+| Both flat and legacy ESLint configs exist | Flag explicitly. ESLint 10 ignores `.eslintrc*` entirely, but it will confuse editors and CI. Ask before deleting.                                            |
+| Project uses ESLint < 10                  | `@jabraf/dev` ships ESLint 10. Warn the user, and ask whether to upgrade (remove any direct `eslint@<10` dep). **[wait for user]**                            |
+| Project uses `eslint-plugin-react`        | `@jabraf/dev` replaced it with `@eslint-react` (incompatible with ESLint 10). Rule names change `react/*` → `@eslint-react/*`; update any overrides/disables. |
+| Project also uses oxlint                  | Use `createBaseEslintConfig({ oxlint: true })` and run `oxlint` before `eslint` in the `lint` script.                                                         |
+| Monorepo (`workspaces` present)           | Ask whether to add at the repo root, in a specific workspace, or both. **[wait for user]** Repeat steps 3–7 in each chosen location.                          |
+| Existing `.eslintignore`                  | Leave it alone. Note: flat config ignores live inside `eslint.config.*`; the base config's built-in ignores cover `dist`, `build`, `node_modules`.            |
+| Non-React project                         | The base config enables React + React Hooks rules by default. Use `createBaseEslintConfig({ react: false })` to drop them.                                    |
+| Network/install failure                   | Surface the package manager error verbatim and stop. Do not retry silently.                                                                                   |
 
 ## Reference
 
 - `@jabraf/dev` ESLint docs: [`packages/jabraf-dev/README.md#eslint`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/README.md#eslint)
 - Subpath export: `@jabraf/dev/eslint` → `./dist/config/code-linting/eslint.base.js` (see [`packages/jabraf-dev/package.json`](https://github.com/jabranr/jabraf-tools/blob/main/packages/jabraf-dev/package.json) `exports` map)
 - Exports: `createBaseEslintConfig` (factory) and `baseEslintConfig` (both named and default). `baseEslintConfig === createBaseEslintConfig()`.
-- React Hooks rules come from `eslint-plugin-react-hooks`, bundled by `@jabraf/dev`.
+- React rules come from `@eslint-react/eslint-plugin` (`recommended-typescript`); React Hooks rules come from `eslint-plugin-react-hooks`. `@eslint-react`'s duplicate hooks rules are turned off. All bundled by `@jabraf/dev`.
+- Oxlint integration: `eslint-plugin-oxlint`, bundled by `@jabraf/dev`. See the `jabraf-oxlint` skill.

@@ -22,6 +22,8 @@ This skill assumes the following sibling skills are installed in the same agent:
 - `jabraf-commitlint`
 - `jabraf-lint-staged`
 
+Optional: `jabraf-oxlint` (only needed if the user opts into oxlint in step 2).
+
 If any are missing, stop on step 1 and tell the user:
 
 > The `jabraf-dev-setup` umbrella delegates to the granular `jabraf-*` skills. Install them alongside this one:
@@ -59,7 +61,7 @@ any granular `jabraf-*` skill in the same task — pick one or the other.
    >
    > 1. `jabraf-tsconfig` (preset: `<detected>`)
    > 2. `jabraf-prettier`
-   > 3. `jabraf-eslint`
+   > 3. `jabraf-eslint` (+ `jabraf-oxlint` alongside: <yes | no>)
    > 4. `jabraf-vitest` (react: `<detected>`)
    > 5. `jabraf-playwright` (<applicable | skipping — pure-Node lib>)
    > 6. `jabraf-commitlint` (config extension: `<.js | .mjs>`)
@@ -73,11 +75,11 @@ any granular `jabraf-*` skill in the same task — pick one or the other.
 
    - **Step 3.1** — `jabraf-tsconfig` with the detected preset.
    - **Step 3.2** — `jabraf-prettier`.
-   - **Step 3.3** — `jabraf-eslint`. Default `eslint.config.ts` (TypeScript is now present from step 3.1).
+   - **Step 3.3** — `jabraf-eslint`. Default `eslint.config.ts` (TypeScript is now present from step 3.1). If the user opted into oxlint, use `createBaseEslintConfig({ oxlint: true })`, then run `jabraf-oxlint` right after.
    - **Step 3.4** — `jabraf-vitest` with the detected `react` flag.
    - **Step 3.5** — `jabraf-playwright`, only if applicable. Skip cleanly otherwise; do not prompt.
    - **Step 3.6** — `jabraf-commitlint`. Surface the hook-manager choice once (carry to step 3.7).
-   - **Step 3.7** — `jabraf-lint-staged`. Reuse the hook manager picked in 3.6 (do not ask again).
+   - **Step 3.7** — `jabraf-lint-staged`. Reuse the hook manager picked in 3.6 (do not ask again). Use `linter: 'both'` if oxlint was opted into.
 
    Between steps, post a one-line progress marker: "✓ `<skill>` done." On any granular skill returning `conflict` or stopping for input, the umbrella stops too and surfaces the situation. **[wait for user on conflict]**
 
@@ -119,6 +121,7 @@ any granular `jabraf-*` skill in the same task — pick one or the other.
   - [`skills/jabraf-tsconfig`](../jabraf-tsconfig/SKILL.md)
   - [`skills/jabraf-prettier`](../jabraf-prettier/SKILL.md)
   - [`skills/jabraf-eslint`](../jabraf-eslint/SKILL.md)
+  - [`skills/jabraf-oxlint`](../jabraf-oxlint/SKILL.md) (optional)
   - [`skills/jabraf-vitest`](../jabraf-vitest/SKILL.md)
   - [`skills/jabraf-playwright`](../jabraf-playwright/SKILL.md)
   - [`skills/jabraf-commitlint`](../jabraf-commitlint/SKILL.md)
