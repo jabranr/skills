@@ -26,7 +26,7 @@ Load when the user's prompt mentions any of:
 - "`jabranr/workflows` PR checks", "jabraf PR checks", "pre-release on PR"
 
 Do not load for adding a step into an existing workflow file (use
-`jabraf-workflows-actionlint`, `jabraf-workflows-wait-cf-pages`, or
+`secureci` from `secure-ci/cli`, `jabraf-workflows-wait-cf-pages`, or
 `jabraf-workflows-performance-audit` instead). Do not load for unrelated CI
 tooling (CircleCI, Travis, Jenkins).
 
@@ -98,7 +98,7 @@ require a user response before continuing.
 
    If `run-pre-release: false`, state: "No secrets required for this caller."
 
-7. **Validate.** Recommend running `actionlint` against the new file. If the repo already has a workflow that uses the `jabraf-workflows-actionlint` composite, this is automatic on the next PR. Otherwise, offer to wire `jabraf-workflows-actionlint` next.
+7. **Validate.** Recommend running `npx @secureci/cli validate` against the new file. If the `secure-ci/cli` action is already wired in another workflow, validation runs on the next PR. Otherwise, offer to wire it next with the `secureci` ([secure-ci/cli](https://github.com/secure-ci/cli/tree/main/skills/secureci)) skill.
 
 ## Pinning
 
@@ -136,4 +136,4 @@ Replace `<full-40-char-sha>` with the commit SHA from
 
 - Source workflow: [`.github/workflows/reusable-pr-checks.yml`](https://github.com/jabranr/workflows/blob/main/.github/workflows/reusable-pr-checks.yml)
 - README section: [`reusable-pr-checks.yml`](https://github.com/jabranr/workflows/blob/main/README.md#reusable-pr-checksyml)
-- Companion skills: `jabraf-workflows-npm-publish` (release on merge), `jabraf-workflows-integration` (Playwright in CI), `jabraf-workflows-actionlint` (lint this file)
+- Companion skills: `jabraf-workflows-npm-publish` (release on merge), `jabraf-workflows-integration` (Playwright in CI), `secureci` ([secure-ci/cli](https://github.com/secure-ci/cli/tree/main/skills/secureci)) (validate this file)

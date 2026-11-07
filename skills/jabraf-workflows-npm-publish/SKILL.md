@@ -93,7 +93,7 @@ require a user response before continuing.
    - `NPM_TOKEN` — required. An npm automation token with publish permission for this package. Add via repo Settings → Secrets and variables → Actions → New repository secret.
    - `GITHUB_TOKEN` — required. Bound automatically by GitHub Actions; no manual setup. The caller's `permissions: contents: write` block grants it the rights to push the version commit and tag.
 
-7. **Validate.** Recommend running `actionlint` against the new file. If `jabraf-workflows-actionlint` is already wired in another workflow, validation runs on the next PR. Otherwise, offer to wire it next.
+7. **Validate.** Recommend running `npx @secureci/cli validate` against the new file. If the `secure-ci/cli` action is already wired in another workflow, validation runs on the next PR. Otherwise, offer to wire it next with the `secureci` ([secure-ci/cli](https://github.com/secure-ci/cli/tree/main/skills/secureci)) skill.
 
 ## Pinning
 
@@ -131,4 +131,4 @@ Replace `<full-40-char-sha>` with the commit SHA from
 
 - Source workflow: [`.github/workflows/reusable-npm-publish.yml`](https://github.com/jabranr/workflows/blob/main/.github/workflows/reusable-npm-publish.yml)
 - README section: [`reusable-npm-publish.yml`](https://github.com/jabranr/workflows/blob/main/README.md#reusable-npm-publishyml)
-- Companion skills: `jabraf-workflows-pr-checks` (CI on PR + optional pre-release), `jabraf-workflows-actionlint` (lint this file)
+- Companion skills: `jabraf-workflows-pr-checks` (CI on PR + optional pre-release), `secureci` ([secure-ci/cli](https://github.com/secure-ci/cli/tree/main/skills/secureci)) (validate this file)
