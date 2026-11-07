@@ -118,7 +118,7 @@ require a user response before continuing.
 
 6. **Print required secrets.** None — state: "No secrets required for this caller."
 
-7. **Validate.** Recommend running `actionlint` against the new file. If `jabraf-workflows-actionlint` is already wired in another workflow, validation runs on the next PR. Otherwise, offer to wire it next.
+7. **Validate.** Recommend running `npx @secureci/cli validate` against the new file. If the `secure-ci/cli` action is already wired in another workflow, validation runs on the next PR. Otherwise, offer to wire it next with the `secureci` ([secure-ci/cli](https://github.com/secure-ci/cli/tree/main/skills/secureci)) skill.
 
 ## Pinning
 
@@ -158,4 +158,4 @@ Replace `<full-40-char-sha>` with the commit SHA from
 
 - Source workflow: [`.github/workflows/reusable-integration.yml`](https://github.com/jabranr/workflows/blob/main/.github/workflows/reusable-integration.yml)
 - README section: [`reusable-integration.yml`](https://github.com/jabranr/workflows/blob/main/README.md#reusable-integrationyml)
-- Companion skills: `jabraf-workflows-pr-checks` (unit/lint/typecheck on PR), `jabraf-workflows-wait-cf-pages` (gate on Pages deploy), `jabraf-workflows-actionlint` (lint this file), `jabraf-playwright` (set up Playwright in the project)
+- Companion skills: `jabraf-workflows-pr-checks` (unit/lint/typecheck on PR), `jabraf-workflows-wait-cf-pages` (gate on Pages deploy), `secureci` ([secure-ci/cli](https://github.com/secure-ci/cli/tree/main/skills/secureci)) (validate this file), `jabraf-playwright` (set up Playwright in the project)

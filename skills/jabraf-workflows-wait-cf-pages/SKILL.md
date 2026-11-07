@@ -116,4 +116,4 @@ Replace `<full-40-char-sha>` with the commit SHA from
 
 - Source action: [`.github/actions/wait-cf-pages-deployment`](https://github.com/jabranr/workflows/tree/main/.github/actions/wait-cf-pages-deployment)
 - README section: [`actions/wait-cf-pages-deployment`](https://github.com/jabranr/workflows/blob/main/README.md#actionswait-cf-pages-deployment)
-- Companion skills: `jabraf-workflows-performance-audit` (Lighthouse job to gate behind the wait), `jabraf-workflows-actionlint` (lint the modified workflow)
+- Companion skills: `jabraf-workflows-performance-audit` (Lighthouse job to gate behind the wait), `secureci` ([secure-ci/cli](https://github.com/secure-ci/cli/tree/main/skills/secureci)) (validate the modified workflow)

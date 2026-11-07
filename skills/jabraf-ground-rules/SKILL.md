@@ -225,8 +225,10 @@ tool manager chosen in section 2.
 - `HUSKY: 0` on steps that run `npm version` / `lerna version`.
 - Version tags are created by the publish workflow only.
 - **Validate, run and inventory workflows with
-  [`@secureci/cli`](https://www.npmjs.com/package/@secureci/cli)** (`secureci`,
-  via `npx @secureci/cli` when not installed):
+  [`@secureci/cli`](https://github.com/secure-ci/cli)** (`secureci`, via
+  `npx @secureci/cli` when not installed). Set it up with the
+  [`secureci`](https://github.com/secure-ci/cli/tree/main/skills/secureci) skill
+  (`npx skills add secure-ci/cli --skill secureci`):
   - `secureci validate .github/workflows/*.yml` — syntax, template injection,
     token permissions, risky triggers; keep workflows passing it.
   - `secureci run <workflow> --dry-run` (or a real local run) to try a workflow
@@ -235,10 +237,9 @@ tool manager chosen in section 2.
     `secureci inventory --check` in CI to fail on tag drift.
   - `secureci pin` to rewrite action tags to commit SHAs (keeps the `# vX`
     comment).
-- **`actionlint` is deprecated here.** Use `secureci validate` in new
-  workflows. Repos still running `actionlint` (incl. the `jabranr/workflows`
-  actionlint action) get "replace actionlint with `secureci validate`" in your
-  follow-ups list; swap it only when asked.
+- **Don't use `actionlint`.** Use `secureci validate`. Repos still running
+  `actionlint` (incl. the `jabranr/workflows` actionlint action) get "replace
+  actionlint with `secureci`" in your follow-ups list; swap it only when asked.
 
 ## 8. Security
 

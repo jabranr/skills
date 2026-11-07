@@ -121,4 +121,4 @@ Replace `<full-40-char-sha>` with the commit SHA from
 
 - Source action: [`.github/actions/performance-audit`](https://github.com/jabranr/workflows/tree/main/.github/actions/performance-audit)
 - README section: [`actions/performance-audit`](https://github.com/jabranr/workflows/blob/main/README.md#actionsperformance-audit)
-- Companion skills: `jabraf-workflows-wait-cf-pages` (gate the audit on a live deploy), `jabraf-workflows-actionlint` (lint the modified workflow)
+- Companion skills: `jabraf-workflows-wait-cf-pages` (gate the audit on a live deploy), `secureci` ([secure-ci/cli](https://github.com/secure-ci/cli/tree/main/skills/secureci)) (validate the modified workflow)

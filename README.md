@@ -37,7 +37,6 @@ skills/
   jabraf-workflows-pr-checks/SKILL.md
   jabraf-workflows-npm-publish/SKILL.md
   jabraf-workflows-integration/SKILL.md
-  jabraf-workflows-actionlint/SKILL.md   # deprecated, prefer @secureci/cli
   jabraf-workflows-wait-cf-pages/SKILL.md
   jabraf-workflows-performance-audit/SKILL.md
 ```
