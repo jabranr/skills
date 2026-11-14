@@ -112,7 +112,9 @@ instruction, doc, README, AGENTS.md, PR and commit message you produce, with no
   consistent; leave dependency lists in `package.json` to the tool.
 - **Config-driven:** environment values via `@jabraf/app-config` `getConfig()`.
   Ship every new user-facing feature behind a flag: on in dev, **off** in
-  production until intentionally launched.
+  production until intentionally launched. In React apps, mount
+  `FeatureFlagsPanel` once at the root so flags can be toggled in-app (any env,
+  incl. mobile) via `?ffs=1`.
 - **Shared, single source:** types and validation schemas (e.g. Zod) live once in a
   shared module and are imported by client, server and DB.
 
