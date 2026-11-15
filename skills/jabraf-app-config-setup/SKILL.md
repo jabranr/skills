@@ -147,7 +147,7 @@ require a user response.
 
    Notes:
    - Render it once, after `setConfig` has run (it reads `getConfig().features`).
-   - It is SSR-safe (renders nothing on the server), but it uses hooks: in Next.js `app/` router, render it from a `'use client'` component, not directly from a server `layout.tsx`.
+   - It is SSR-safe (renders nothing on the server) and the module is marked `'use client'`, so it can be rendered directly from a server `layout.tsx` (Next.js `app/` router). It reads `getConfig()` in the browser, so `setConfig` must also run in client code — flag it if the bootstrap from step 8 is server-only.
    - Defaults are fine for most apps. Only pass props the user asks for: `position` (`'bottom-right'` default / `'bottom-left'` / `'top-right'` / `'top-left'`), `draggable` (default `true`), `queryParam` (default `'ffs'`), `gestureTaps` (default `5`, `0` disables the gesture), `onChange` (default reloads the page after a flag change).
    - Tell the user how to open it: visit any page with `?ffs=1` (`?ffs=0` to disable) or tap the bottom-right corner 5 times within 3s. It stays enabled via an `ffs` cookie until **Hide** is pressed.
 
