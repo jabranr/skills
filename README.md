@@ -59,22 +59,31 @@ Keep repo docs to what is specific to that repo; change shared rules here.
 ### Cloud sessions
 
 Section 11 of `jabraf-ground-rules` covers agent cloud sessions (e.g. Claude Code
-on the web): git identity, a plan-only main agent that delegates implementation
-to subagents, and model choices. A cloud environment's setup script can fetch
-the file as base instructions:
+on the web): git identity, pushing so work is not lost, a main agent that plans
+and delegates implementation to subagents, and model choices. A cloud
+environment's setup script can fetch the file as base instructions:
 
 ```
-https://raw.githubusercontent.com/jabranr/skills/main/skills/jabraf-ground-rules/SKILL.md
+https://raw.githubusercontent.com/jabranr/skills/<ref>/skills/jabraf-ground-rules/SKILL.md
 ```
 
-The setup script can override the model choices with these variables:
+Replace `<ref>` with a commit SHA or tag rather than `main`, so a push to `main`
+does not change the instructions of every later session until you move the pin.
 
-| Variable                        | Default            |
-| ------------------------------- | ------------------ |
-| `AGENT_MAIN_MODEL`              | `claude-fable-5-2` |
-| `AGENT_MAIN_FALLBACK_MODEL`     | `claude-opus-5-5`  |
-| `AGENT_SUBAGENT_MODEL`          | `claude-opus-5-5`  |
-| `AGENT_SUBAGENT_FALLBACK_MODEL` | `claude-haiku-5-5` |
+Variables the setup script can set:
+
+| Variable                        | Purpose                                        | Default            |
+| ------------------------------- | ---------------------------------------------- | ------------------ |
+| `AGENT_CLOUD_SESSION`           | `1` marks the session as a cloud session       | unset              |
+| `AGENT_MAIN_MODEL`              | Main agent model                               | `claude-fable-5-2` |
+| `AGENT_MAIN_FALLBACK_MODEL`     | Main agent model when the first is unavailable | `claude-opus-5-5`  |
+| `AGENT_SUBAGENT_MODEL`          | Subagent model                                 | `claude-opus-5-5`  |
+| `AGENT_SUBAGENT_FALLBACK_MODEL` | Subagent model when the first is unavailable   | `claude-haiku-5-5` |
+
+The skill can only choose subagent models. The two `AGENT_MAIN_*` variables take
+effect only when the setup script also maps them onto the agent harness's own
+model setting. Claude Code on the web is detected through `CLAUDE_CODE_REMOTE`
+and does not need `AGENT_CLOUD_SESSION`.
 
 ## Install
 
