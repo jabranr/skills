@@ -1,6 +1,6 @@
 ---
 name: jabraf-ground-rules
-description: Jabran's ground rules for every project — how to work (clarify first, stay scoped, report real results) plus default stack (Cloudflare, Tailwind v4), TypeScript, testing, git/PR, gh, CI, security and docs conventions, and the cloud-session rules (git identity, plan-only main agent, model choices). Load at the start of any coding, repo, review, commit, PR or GitHub Actions task, and whenever a repo's AGENTS.md points to it or is silent on a convention.
+description: Jabran's ground rules for every project — how to work (clarify first, stay scoped, report real results) plus default stack (Cloudflare, Tailwind v4), TypeScript, testing, git/PR, gh, CI, security and docs conventions. Load at the start of any coding, repo, review, commit, PR or GitHub Actions task, and whenever a repo's AGENTS.md points to it or is silent on a convention.
 ---
 
 # `jabraf-ground-rules`
@@ -12,7 +12,8 @@ more specific and **wins on conflict**; local machine rules (e.g.
 every gap they leave.
 
 Section 1 applies to every task, chats included. Sections 2–10 apply when the
-task touches a codebase. Section 11 applies in cloud sessions.
+task touches a codebase. Cloud sessions also follow the `jabraf-cloud-session`
+skill, which wins where the two differ.
 
 ## 1. How to work (every task)
 
@@ -187,7 +188,6 @@ tool manager chosen in section 2.
 - **Agent autonomy:** you may commit to a feature branch. Pushing, opening,
   updating or merging PRs and issues, tagging, rebasing shared branches and
   force-pushing each wait for the user's explicit, one-time ask.
-  Cloud sessions push their feature branch without asking (section 11).
 - **Conventional Commits:** `type(scope): subject` with types `feat`, `fix`,
   `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`. Imperative
   subject under ~72 chars; the _why_ goes in the body; breaking changes use `!` or
@@ -204,8 +204,7 @@ tool manager chosen in section 2.
 ### gh and GitHub
 
 - Use the `gh` CLI for GitHub repos, issues, PRs and links in the user's own
-  repos, rather than fetching the web page. Cloud sessions without `gh` use
-  the platform's GitHub tools (section 11).
+  repos, rather than fetching the web page.
 - Use `github.com` / `api.github.com` for every `gh` and API call, even when a
   git remote uses an SSH host alias.
 
@@ -287,145 +286,6 @@ skill (install: `npx skills add jabranr/skills -g --skill jabraf-ground-rules`).
 This file lists only what is specific to this repo and wins where the two differ.
 ```
 
-## 11. Cloud sessions
-
-Applies when the session runs in a remote, ephemeral agent container. Treat the
-session as a cloud session when either variable is set:
-
-- `AGENT_CLOUD_SESSION=1`, set by the environment's setup script (any agent).
-- `CLAUDE_CODE_REMOTE=true`, set by Claude Code on the web.
-
-Local sessions skip this section.
-
-### Git identity
-
-Check these four variables before the first commit. Set each one that is unset
-or empty to the value below, and leave any that already has a value as it is.
-
-```bash
-export GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-Jabran Rafique}"
-export GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-2131246+jabranr@users.noreply.github.com}"
-export GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-Jabran Rafique}"
-export GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-2131246+jabranr@users.noreply.github.com}"
-```
-
-Shell state often does not carry from one command to the next, so make the
-values reach every `git commit`: persist them where the session's shell loads
-them, or run the exports in the same command as the commit. Leave
-`git config user.*` alone.
-
-### Git and GitHub in the cloud
-
-The container is discarded when the session ends, so unpushed work is lost.
-These two points replace their section 6 counterparts in a cloud session:
-
-- **Push without asking.** Push the session's feature branch after each commit
-  or batch of commits. Everything else in section 6 still waits for the user's
-  explicit ask: opening, updating or merging PRs and issues, tagging, rebasing
-  shared branches, force-pushing, and pushing to any other branch.
-- **GitHub access.** Use `gh` when it is installed. When it is not, use the
-  GitHub tools the platform provides.
-
-### Models
-
-The setup script may set these variables. Use the value when one is set and the
-default when it is not.
-
-| Variable                        | Role                               | Default            |
-| ------------------------------- | ---------------------------------- | ------------------ |
-| `AGENT_MAIN_MODEL`              | Main agent                         | `claude-fable-5-2` |
-| `AGENT_MAIN_FALLBACK_MODEL`     | Main agent, when the first is down | `claude-opus-5-5`  |
-| `AGENT_SUBAGENT_MODEL`          | Every subagent                     | `claude-opus-5-5`  |
-| `AGENT_SUBAGENT_FALLBACK_MODEL` | Subagents, when the first is down  | `claude-haiku-5-5` |
-
-- **Main agent.** The harness picks the main model before these rules load, so
-  the two `AGENT_MAIN_*` variables only record what the setup script intended;
-  the setup script is what applies them, by mapping them onto the harness's own
-  model setting. Check which model is serving the session where the harness
-  lets you. If it is neither the main model nor its fallback, say so in your
-  first reply and carry on.
-- **Subagents.** Pass the subagent model explicitly on every spawn. When a spawn
-  fails because that model is unavailable, retry once with the fallback and
-  tell the user at that point, naming the task and the model, rather than
-  leaving it for the final summary.
-
-### Main agent: plan, delegate, guide
-
-The main agent plans and coordinates, and subagents implement.
-
-**The one exception: a small ask that needs no questions.** Do the work yourself
-only when both hold:
-
-- you have no follow-up questions for the user, and
-- the whole change is under 50 changed lines (added plus removed).
-
-Open your reply by saying you are doing it yourself, with any assumptions you
-are making, so the user can stop you. Then implement, run the gate, commit,
-push and report. The exception ends the moment a question for the user comes up
-or the change grows past 50 lines: stop implementing, say so, and take the ask
-through the steps below.
-
-For every other ask:
-
-1. **Plan by interview.** Read the code and ask follow-up questions until the
-   plan is comprehensive: goal, scope, files, approach, tests, gate commands,
-   and what is left out. Reading, searching and running read-only commands are
-   yours to do; editing files, running generators or installs, and committing
-   are not.
-2. **Wait for the go-ahead.** Stay in planning until the user directs you to
-   implement. Approving one plan covers that plan only.
-3. **Hand over.** Split the plan into tasks and give each to a subagent with a
-   brief (see "The brief" below). Tasks that run in parallel touch disjoint
-   files; tasks that share a file or depend on each other run in order.
-4. **Wait and guide.** Wait for every subagent to report. When one reports an
-   error or asks a question, answer with your best judgement whenever the plan,
-   the code or these rules settle it, and send the fix back to a subagent. Ask
-   the user when the answer would change scope, is a decision the plan left
-   open, or needs an approval that section 6 reserves for them. Also go to the
-   user, with what was tried, when a task has failed twice or a subagent has
-   stopped responding and its replacement fails too.
-5. **Verify the whole.** Tasks that each pass can still break together. Once
-   all work has landed, run the full gate (section 5) once on the combined
-   result, yourself or through one final subagent. Send any failure back to a
-   subagent as a new task.
-6. **Push and summarise.** Push the branch, then reply with a short summary:
-   what changed, the final gate results as observed, any fallback model used,
-   and follow-ups.
-
-### The brief
-
-A subagent starts with none of the conversation, so the brief is all it knows.
-Write it to stand alone, and leave the conversation itself out. Every brief
-has, in this order:
-
-1. **Role.** Open with: "You are a subagent. Implement this task. Do not plan
-   with the user, and do not spawn subagents." A subagent that loads this skill
-   reads this section too, and this line is how it knows which role it has.
-2. **Goal.** What this task achieves and why, in a sentence or two.
-3. **Exact files.** The paths to change or create, and the paths to read for
-   context. Name anything it must leave untouched.
-4. **Decisions made.** What the interview settled that the code does not show:
-   choices the user made, options that were rejected and why, and anything
-   deliberately left out of scope.
-5. **Constraints.** The limits for this task: which rules of this skill
-   matter most here, the gate commands to run, and files other subagents own.
-6. **Done.** What finished looks like and what to report back: files changed,
-   the gate output as observed, the commit hash, and any open question.
-
-When the plan is too large or too interlinked for briefs to carry without
-losing decisions, save it to a file in `ai-docs/` (section 9) and point each
-brief at that file, keeping the role, the task's own files and its done
-criteria in the brief. This is the one case where a plan is written to and read
-from `ai-docs/` without the user asking.
-
-### Subagents
-
-- Follow sections 1 to 10 and the brief. Put a question the brief does not
-  answer to the main agent rather than guessing.
-- Commit your own task on the feature branch, staging only the files the brief
-  gave you, by path. When another subagent's commit holds the git lock, wait
-  and retry. Leave pushing to the main agent.
-
 ## Definition of done
 
 - [ ] Scope matches the ask; follow-ups listed separately.
@@ -433,5 +293,4 @@ from `ai-docs/` without the user asking.
 - [ ] Gate run, each result reported as observed.
 - [ ] No secrets, generated files, local state or `ai-docs/` references staged.
 - [ ] Docs updated where behaviour, commands or setup changed.
-- [ ] Committed on a feature branch; nothing pushed unless asked (cloud sessions: branch pushed).
-- [ ] In a cloud session: work delegated unless it met the small-ask exception, full gate run on the combined result, summary given.
+- [ ] Committed on a feature branch; nothing pushed unless asked.
