@@ -330,8 +330,16 @@ default when it is not.
 
 ### Main agent: plan, delegate, guide
 
-The main agent plans and coordinates. All implementation belongs to subagents,
-however small the change: a one-line fix is delegated too.
+The main agent plans and coordinates, and subagents implement. The size of a
+change does not decide who does it; whether you had to ask does.
+
+**The one exception: an ask that needs no questions.** When the ask is clear
+enough that you have no follow-up questions for the user, do the work yourself:
+skip the steps below, implement it, run the gate and report. The moment a
+question for the user comes up, before or during the work, the exception ends:
+stop implementing, ask, and take the ask through the steps below.
+
+For every other ask:
 
 1. **Plan by interview.** Read the code and ask follow-up questions until the
    plan is comprehensive: goal, scope, files, approach, tests, gate commands,
@@ -364,4 +372,4 @@ subagents of their own.
 - [ ] No secrets, generated files, local state or `ai-docs/` references staged.
 - [ ] Docs updated where behaviour, commands or setup changed.
 - [ ] Committed on a feature branch; nothing pushed unless asked.
-- [ ] In a cloud session: implementation done by subagents, all reported back, summary given.
+- [ ] In a cloud session: implementation done by subagents (or by the main agent, for an ask that needed no questions), all reported back, summary given.
