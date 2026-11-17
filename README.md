@@ -18,7 +18,6 @@ supported agent (Claude Code, Codex, Cursor, OpenCode, and others).
 skills/
   # Baseline for every project
   jabraf-ground-rules/SKILL.md         # common rules; repos point to it from AGENTS.md
-  jabraf-cloud-session/SKILL.md        # cloud sessions only; fetched by the setup script
 
   # @jabraf/dev tooling
   jabraf-prettier/SKILL.md
@@ -59,13 +58,13 @@ Keep repo docs to what is specific to that repo; change shared rules here.
 
 ### Cloud sessions
 
-The `jabraf-cloud-session` skill covers agent cloud sessions (e.g. Claude Code
+Section 11 of `jabraf-ground-rules` covers agent cloud sessions (e.g. Claude Code
 on the web): git identity, pushing so work is not lost, a main agent that plans
 and delegates implementation to subagents, and model choices. A cloud
 environment's setup script can fetch the file as base instructions:
 
 ```
-https://raw.githubusercontent.com/jabranr/skills/<ref>/skills/jabraf-cloud-session/SKILL.md
+https://raw.githubusercontent.com/jabranr/skills/<ref>/skills/jabraf-ground-rules/SKILL.md
 ```
 
 Replace `<ref>` with a commit SHA or tag rather than `main`, so a push to `main`
