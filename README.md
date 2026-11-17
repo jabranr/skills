@@ -56,6 +56,26 @@ This file lists only what is specific to this repo and wins where the two differ
 
 Keep repo docs to what is specific to that repo; change shared rules here.
 
+### Cloud sessions
+
+Section 11 of `jabraf-ground-rules` covers agent cloud sessions (e.g. Claude Code
+on the web): git identity, a plan-only main agent that delegates implementation
+to subagents, and model choices. A cloud environment's setup script can fetch
+the file as base instructions:
+
+```
+https://raw.githubusercontent.com/jabranr/skills/main/skills/jabraf-ground-rules/SKILL.md
+```
+
+The setup script can override the model choices with these variables:
+
+| Variable                        | Default            |
+| ------------------------------- | ------------------ |
+| `AGENT_MAIN_MODEL`              | `claude-fable-5-2` |
+| `AGENT_MAIN_FALLBACK_MODEL`     | `claude-opus-5-5`  |
+| `AGENT_SUBAGENT_MODEL`          | `claude-opus-5-5`  |
+| `AGENT_SUBAGENT_FALLBACK_MODEL` | `claude-haiku-5-5` |
+
 ## Install
 
 Use the [`skills` CLI](https://github.com/vercel-labs/skills) — no clone, no

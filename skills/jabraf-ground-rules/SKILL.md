@@ -1,6 +1,6 @@
 ---
 name: jabraf-ground-rules
-description: Jabran's ground rules for every project — how to work (clarify first, stay scoped, report real results) plus default stack (Cloudflare, Tailwind v4), TypeScript, testing, git/PR, gh, CI, security and docs conventions. Load at the start of any coding, repo, review, commit, PR or GitHub Actions task, and whenever a repo's AGENTS.md points to it or is silent on a convention.
+description: Jabran's ground rules for every project — how to work (clarify first, stay scoped, report real results) plus default stack (Cloudflare, Tailwind v4), TypeScript, testing, git/PR, gh, CI, security and docs conventions, and the cloud-session rules (git identity, plan-only main agent, model choices). Load at the start of any coding, repo, review, commit, PR or GitHub Actions task, and whenever a repo's AGENTS.md points to it or is silent on a convention.
 ---
 
 # `jabraf-ground-rules`
@@ -12,7 +12,7 @@ more specific and **wins on conflict**; local machine rules (e.g.
 every gap they leave.
 
 Section 1 applies to every task, chats included. Sections 2–10 apply when the
-task touches a codebase.
+task touches a codebase. Section 11 applies in cloud sessions.
 
 ## 1. How to work (every task)
 
@@ -285,6 +285,77 @@ skill (install: `npx skills add jabranr/skills -g --skill jabraf-ground-rules`).
 This file lists only what is specific to this repo and wins where the two differ.
 ```
 
+## 11. Cloud sessions
+
+Applies when the session runs in a remote, ephemeral agent container, such as
+Claude Code on the web (`CLAUDE_CODE_REMOTE=true`) or another agent's cloud
+runner. Local sessions skip this section.
+
+### Git identity
+
+Check these four variables before the first commit. Set each one that is unset
+or empty to the value below, and leave any that already has a value as it is.
+
+```bash
+export GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-Jabran Rafique}"
+export GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-2131246+jabranr@users.noreply.github.com}"
+export GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-Jabran Rafique}"
+export GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-2131246+jabranr@users.noreply.github.com}"
+```
+
+Shell state often does not carry from one command to the next, so make the
+values reach every `git commit`: persist them where the session's shell loads
+them, or run the exports in the same command as the commit. Leave
+`git config user.*` alone.
+
+### Models
+
+The setup script may set these variables. Use the value when one is set and the
+default when it is not.
+
+| Variable                        | Role                               | Default            |
+| ------------------------------- | ---------------------------------- | ------------------ |
+| `AGENT_MAIN_MODEL`              | Main agent                         | `claude-fable-5-2` |
+| `AGENT_MAIN_FALLBACK_MODEL`     | Main agent, when the first is down | `claude-opus-5-5`  |
+| `AGENT_SUBAGENT_MODEL`          | Every subagent                     | `claude-opus-5-5`  |
+| `AGENT_SUBAGENT_FALLBACK_MODEL` | Subagents, when the first is down  | `claude-haiku-5-5` |
+
+- **Main agent.** The harness picks the main model before these rules load, so
+  you cannot switch it yourself. Read which model is serving the session; if it
+  is neither the main model nor its fallback, say so in your first reply and
+  carry on.
+- **Subagents.** Pass the subagent model explicitly on every spawn. When a spawn
+  fails because that model is unavailable, retry once with the fallback and name
+  the fallback in the final summary.
+
+### Main agent: plan, delegate, guide
+
+The main agent plans and coordinates. All implementation belongs to subagents,
+however small the change: a one-line fix is delegated too.
+
+1. **Plan by interview.** Read the code and ask follow-up questions until the
+   plan is comprehensive: goal, scope, files, approach, tests, gate commands,
+   and what is left out. Reading, searching and running read-only commands are
+   yours to do; editing files, running generators or installs, and committing
+   are not.
+2. **Wait for the go-ahead.** Stay in planning until the user directs you to
+   implement. Approving one plan covers that plan only.
+3. **Hand over.** Split the plan into tasks and give each to a subagent with a
+   brief that stands alone: the goal, the files, the constraints, the relevant
+   rules from this skill, and what done looks like. Run independent tasks in
+   parallel and dependent ones in order.
+4. **Wait and guide.** Wait for every subagent to report. When one reports an
+   error or asks a question, answer with your best judgement whenever the plan,
+   the code or these rules settle it, and send the fix back to a subagent. Ask
+   the user only when the answer would change scope, is a decision the plan left
+   open, or needs an approval that section 6 reserves for them.
+5. **Summarise.** Once every subagent has reported its work complete, reply
+   with a short summary: what changed, the gate results as the subagents
+   observed them, any fallback model used, and follow-ups.
+
+Subagents follow the rest of this skill (sections 1 to 10) and do not spawn
+subagents of their own.
+
 ## Definition of done
 
 - [ ] Scope matches the ask; follow-ups listed separately.
@@ -293,3 +364,4 @@ This file lists only what is specific to this repo and wins where the two differ
 - [ ] No secrets, generated files, local state or `ai-docs/` references staged.
 - [ ] Docs updated where behaviour, commands or setup changed.
 - [ ] Committed on a feature branch; nothing pushed unless asked.
+- [ ] In a cloud session: implementation done by subagents, all reported back, summary given.
