@@ -121,6 +121,11 @@ npm run skills:index -- --prune   # also drop entries that were not discovered
 npm run skills:index:check        # CI: fail if either output is out of date with catalog.json
 ```
 
+Entries already in the catalog are checked against their source repo on every
+sync, so they stay listed after the skills are uninstalled locally. That makes
+it safe to install only `jabraf-skills-index` globally: to add a new skill,
+install it with `npx skills add`, run the sync, then remove it again.
+
 A new skill lands in an "Unsorted" group, with its description's first sentence
 as the "when" line. Move it into a group and rewrite that line. To leave a
 skill out, add it to `skip`. Targets track each source repo's default branch,

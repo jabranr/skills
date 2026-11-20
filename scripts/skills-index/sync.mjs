@@ -157,6 +157,20 @@ function discover() {
     add(name, { repo: s.source, path });
   }
 
+  // The catalog is a source too, so skills stay listed after they are uninstalled locally
+  // (e.g. when only jabraf-skills-index is installed). Plugin skills are rediscovered below.
+  for (const s of catalog.groups.flatMap((g) => g.skills)) {
+    if (found.has(s.name) || s.plugin || !s.repo || s.repo === OWN_REPO) continue;
+    const r = repo(s.repo);
+    const path = r.has(`${s.path}/SKILL.md`) ? s.path : r.skills.find((d) => basename(d) === s.name);
+    if (!path) {
+      console.warn(`! ${s.name}: no longer in ${s.repo}`);
+      continue;
+    }
+    if (path !== s.path) console.log(`~ ${s.name}: moved upstream to ${path}`);
+    add(s.name, { repo: s.repo, path });
+  }
+
   for (const [plugin, source] of Object.entries(installedPlugins())) {
     catalog.plugins[plugin] = { ...catalog.plugins[plugin], source };
   }
