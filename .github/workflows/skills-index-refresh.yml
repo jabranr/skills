@@ -1,0 +1,78 @@
+name: Skills Index Refresh
+
+# Re-runs the skills index sync against every source repo and opens (or updates)
+# a PR when the catalog, SKILL.md or marketplace.json would change: skills that
+# moved upstream, default-branch renames, new skills inside listed plugins, and
+# changed plugin descriptions. Newly installed CLI skills are not visible here
+# (CI has no local lock file); run `npm run skills:index` locally for those.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Mondays 06:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      BRANCH: chore/skills-index-refresh
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: .node-version
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync skills index
+        shell: bash # pipefail, so a failed sync is not masked by tee
+        run: npm run --silent skills:index 2>&1 | tee "$RUNNER_TEMP/sync.log"
+
+      - name: Open or update PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HUSKY: '0'
+        run: |
+          if git diff --quiet; then
+            echo "Skills index is already up to date."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -C "$BRANCH"
+          git commit -am 'chore(skills-index): refresh catalog from upstream sources'
+          git push --force origin "$BRANCH"
+
+          {
+            echo 'Weekly re-sync of `jabraf-skills-index` and the `jabraf` marketplace against upstream skill and plugin repos.'
+            echo
+            echo 'Sync log:'
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/sync.log"
+            echo '```'
+            echo
+            echo 'Move any skill in "Unsorted" into a group and rewrite its `when` line before merging.'
+          } > "$RUNNER_TEMP/body.md"
+
+          if [ -n "$(gh pr list --head "$BRANCH" --state open --json number -q '.[].number')" ]; then
+            gh pr edit "$BRANCH" --body-file "$RUNNER_TEMP/body.md"
+          elif ! gh pr create --head "$BRANCH" --base "${{ github.event.repository.default_branch }}" \
+            --title 'chore(skills-index): refresh catalog from upstream sources' \
+            --body-file "$RUNNER_TEMP/body.md"; then
+            echo "::error::Pushed $BRANCH but could not open a PR. Enable Settings > Actions > General > 'Allow GitHub Actions to create and approve pull requests', or open the PR from the branch by hand."
+            exit 1
+          fi

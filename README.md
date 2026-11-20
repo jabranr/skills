@@ -86,6 +86,41 @@ effect only when the setup script also maps them onto the agent harness's own
 model setting. Claude Code on the web is detected through `CLAUDE_CODE_REMOTE`
 and does not need `AGENT_CLOUD_SESSION`.
 
+#### Skills in cloud sessions
+
+A cloud session starts on a fresh machine with only the repo cloned, so skills
+installed globally on your own machine are not there. Two ways to bring the
+library in:
+
+- **Environment setup script** (every repo that uses the environment). Add this
+  line to the cloud environment's setup script. It installs the latest
+  `jabraf-skills-index` at the start of each session:
+
+  ```bash
+  npx -y skills add jabranr/skills -g -a claude-code --skill jabraf-skills-index -y
+  ```
+
+- **Per repo, through the plugin marketplace.** Commit `.claude/settings.json`
+  in the repo. This works for local and cloud sessions in that repo, and adds
+  this repo's skills, including the index, as the `jabraf-skills` plugin:
+
+  ```json
+  {
+    "extraKnownMarketplaces": {
+      "jabraf": { "source": { "source": "github", "repo": "jabranr/skills" } }
+    },
+    "enabledPlugins": {
+      "jabraf-skills@jabraf": true
+    }
+  }
+  ```
+
+  Add more entries, such as `"searchfit-seo@jabraf": true`, for plugins whose
+  agents or commands you want too.
+
+The index loads other skills over the network, so the environment's network
+access must allow `github.com` and the npm registry.
+
 ## One skill for the whole library
 
 `jabraf-skills-index` is a router. Install it instead of the whole library and
@@ -130,6 +165,25 @@ A new skill lands in an "Unsorted" group, with its description's first sentence
 as the "when" line. Move it into a group and rewrite that line. To leave a
 skill out, add it to `skip`. Targets track each source repo's default branch,
 because `skills use` cannot pin to a commit.
+
+### Keeping it up to date
+
+- **Skills the index points to** need no updates: each load fetches the
+  source repo's default branch.
+- **The index itself:** `npx skills update jabraf-skills-index -g`. Cloud
+  sessions that install it in the setup script always get the latest.
+- **The catalog:** the
+  [Skills Index Refresh](.github/workflows/skills-index-refresh.yml) workflow
+  runs the sync every Monday (or on demand) and opens a PR when anything
+  changed upstream: moved skills, renamed default branches, new skills inside
+  listed plugins. CI has no local lock file, so it cannot see skills you
+  installed yourself. For those, run `npm run skills:index` locally. The
+  workflow needs **Settings > Actions > General > Allow GitHub Actions to create
+  and approve pull requests**. PRs opened with the workflow token do not trigger
+  other workflows, so push a commit to the branch (or close and reopen the PR)
+  to run Skills Check on it.
+- **Plugins** (Claude Code): `/plugin marketplace update jabraf`, then update
+  the plugins from `/plugin`.
 
 ## Claude Code plugin marketplace
 
