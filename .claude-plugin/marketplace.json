@@ -1,0 +1,43 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "jabraf",
+  "description": "Jabran's skills plus the third-party Claude Code plugins used alongside them.",
+  "owner": { "name": "Jabran Rafique", "url": "https://github.com/jabranr" },
+  "plugins": [
+    {
+      "name": "jabraf-skills",
+      "description": "Every skill in jabranr/skills, including the jabraf-skills-index router.",
+      "source": "./",
+      "strict": false
+    },
+    {
+      "name": "frontend-design",
+      "description": "Frontend design skill for UI/UX implementation",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/anthropics/claude-plugins-official.git",
+        "path": "plugins/frontend-design"
+      }
+    },
+    {
+      "name": "remotion",
+      "description": "Remotion video creation skills — best practices, animations, audio, captions, 3D, and more for building programmatic videos with React.",
+      "source": { "source": "github", "repo": "remotion-dev/claude-code-plugin" }
+    },
+    {
+      "name": "mattpocock-skills",
+      "description": "Matt Pocock's agent skills for real engineering: grilling, spec/ticket flows, TDD, code review, domain modelling and more. Plug-and-play, not vibe coding.",
+      "source": { "source": "github", "repo": "mattpocock/skills" }
+    },
+    {
+      "name": "searchfit-seo",
+      "description": "Free AI-powered SEO toolkit — audit websites, plan content strategy, optimize pages, generate schema markup, cluster keywords, and track AI visibility. Works with any website or codebase.",
+      "source": { "source": "github", "repo": "searchfit/searchfit-seo" }
+    },
+    {
+      "name": "unslop",
+      "description": "Turns vibecoded, AI-looking UI into a designed interface with its own character",
+      "source": { "source": "github", "repo": "heydamir/unslop" }
+    }
+  ]
+}

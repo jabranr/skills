@@ -1,0 +1,784 @@
+{
+  "skip": {
+    "grill-me": "alias that only forwards to grilling",
+    "jabraf-workflows-actionlint": "deprecated; removed from this repo in favour of secureci",
+    "jabraf-skills-index": "this index",
+    "ask-matt": "Matt Pocock's own skill router; this index covers it",
+    "scaffold-exercises": "course-authoring tool",
+    "migrate-to-shoehorn": "one-off migration for @total-typescript/shoehorn"
+  },
+  "plugins": {
+    "frontend-design": {
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/anthropics/claude-plugins-official.git",
+        "path": "plugins/frontend-design"
+      },
+      "description": "Frontend design skill for UI/UX implementation",
+      "extras": []
+    },
+    "remotion": {
+      "source": { "source": "github", "repo": "remotion-dev/claude-code-plugin" },
+      "description": "Remotion video creation skills — best practices, animations, audio, captions, 3D, and more for building programmatic videos with React.",
+      "extras": []
+    },
+    "mattpocock-skills": {
+      "source": { "source": "github", "repo": "mattpocock/skills" },
+      "exclude": ["skills/deprecated/", "skills/in-progress/"],
+      "description": "Matt Pocock's agent skills for real engineering: grilling, spec/ticket flows, TDD, code review, domain modelling and more. Plug-and-play, not vibe coding.",
+      "extras": []
+    },
+    "searchfit-seo": {
+      "source": { "source": "github", "repo": "searchfit/searchfit-seo" },
+      "description": "Free AI-powered SEO toolkit — audit websites, plan content strategy, optimize pages, generate schema markup, cluster keywords, and track AI visibility. Works with any website or codebase.",
+      "extras": ["agents", "commands"]
+    },
+    "unslop": {
+      "source": { "source": "github", "repo": "heydamir/unslop" },
+      "description": "Turns vibecoded, AI-looking UI into a designed interface with its own character",
+      "extras": []
+    }
+  },
+  "sources": {
+    "JuliusBrussee/caveman": { "branch": "main" },
+    "addyosmani/agent-skills": { "branch": "main" },
+    "anthropics/claude-plugins-official": { "branch": "main" },
+    "benjitaylor/skills": { "branch": "main" },
+    "cli/cli": { "branch": "trunk" },
+    "emilkowalski/skills": { "branch": "main" },
+    "heydamir/unslop": { "branch": "main" },
+    "jabranr/skills": { "branch": "main" },
+    "mattpocock/skills": { "branch": "main" },
+    "nutlope/hallmark": { "branch": "main" },
+    "remotion-dev/claude-code-plugin": { "branch": "main" },
+    "searchfit/searchfit-seo": { "branch": "main" }
+  },
+  "groups": [
+    {
+      "title": "Shape, specify and plan",
+      "skills": [
+        {
+          "name": "idea-refine",
+          "when": "a raw or vague idea needs options generated, then narrowed to one concept",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/idea-refine"
+        },
+        {
+          "name": "interview-me",
+          "when": "the ask is underspecified and the user's real intent is unknown",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/interview-me"
+        },
+        {
+          "name": "grilling",
+          "when": "the user wants an existing plan, decision or idea stress-tested",
+          "repo": "mattpocock/skills",
+          "path": "skills/productivity/grilling",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "grill-with-docs",
+          "when": "stress-test a plan and record ADRs and a glossary while doing it",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/grill-with-docs",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "domain-modeling",
+          "when": "build or sharpen a project's domain model and ubiquitous language",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/domain-modeling",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "spec-driven-development",
+          "when": "a project, feature or significant change has no spec or PRD yet",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/spec-driven-development"
+        },
+        {
+          "name": "to-spec",
+          "when": "turn the current conversation into a spec published to the issue tracker",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/to-spec",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "to-tickets",
+          "when": "break a plan, spec or conversation into tracer-bullet tickets with blocking edges on the issue tracker",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/to-tickets",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "wayfinder",
+          "when": "plan work too big for one session as a map of decision tickets on the issue tracker",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/wayfinder",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "to-questionnaire",
+          "when": "turn an open decision into a questionnaire for someone else to fill in",
+          "repo": "mattpocock/skills",
+          "path": "skills/productivity/to-questionnaire",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "planning-and-task-breakdown",
+          "when": "a spec or clear requirements exist and need ordered, sized tasks",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/planning-and-task-breakdown"
+        },
+        {
+          "name": "prototype",
+          "when": "a throwaway prototype answers a state-model or UI design question",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/prototype",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "research",
+          "when": "investigate a question against primary sources and save findings as Markdown in the repo",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/research",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "source-driven-development",
+          "when": "framework or library choices must be verified against official docs, with citations",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/source-driven-development"
+        }
+      ]
+    },
+    {
+      "title": "Build",
+      "skills": [
+        {
+          "name": "implement",
+          "when": "implement a piece of work from a spec or set of tickets",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/implement",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "implement-spec",
+          "when": "implement the output of `to-spec` and its tickets",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/implement-spec",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "incremental-implementation",
+          "when": "a change touches more than one file, rolls out behind a flag, or feels too big for one step",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/incremental-implementation"
+        },
+        {
+          "name": "test-driven-development",
+          "when": "any logic change, bug fix or behaviour change: red-green-refactor by default",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/test-driven-development"
+        },
+        {
+          "name": "tdd",
+          "when": "the user explicitly asks for test-first, red-green-refactor, or integration tests",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/tdd",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "api-and-interface-design",
+          "when": "designing a REST/GraphQL endpoint, type contract, module boundary or other public interface",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/api-and-interface-design"
+        },
+        {
+          "name": "codebase-design",
+          "when": "designing or deepening one module's interface, placing a seam, making code testable",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/codebase-design",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "improve-codebase-architecture",
+          "when": "scan a whole codebase for deepening opportunities and report them visually",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/improve-codebase-architecture",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "code-simplification",
+          "when": "working code needs to be clearer without changing behaviour",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/code-simplification"
+        },
+        {
+          "name": "deprecation-and-migration",
+          "when": "removing or replacing a system, API or feature, or a zero-downtime schema migration",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/deprecation-and-migration"
+        },
+        {
+          "name": "constraint-driven-development",
+          "when": "set or enforce a written quality bar (CONSTRAINTS.md); agents are skipping tests or silencing checks",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/constraint-driven-development"
+        },
+        {
+          "name": "doubt-driven-development",
+          "when": "high-stakes or unfamiliar work where each decision gets an adversarial fresh-context review",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/doubt-driven-development"
+        }
+      ]
+    },
+    {
+      "title": "Debug, verify and harden",
+      "skills": [
+        {
+          "name": "debugging-and-error-recovery",
+          "when": "a test fails, a build breaks, or behaviour does not match expectations",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/debugging-and-error-recovery"
+        },
+        {
+          "name": "diagnosing-bugs",
+          "when": "a hard bug or performance regression that needs a disciplined diagnosis loop",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/diagnosing-bugs",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "browser-testing-with-devtools",
+          "when": "inspect DOM, console, network or performance in a real browser via Chrome DevTools MCP",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/browser-testing-with-devtools"
+        },
+        {
+          "name": "performance-optimization",
+          "when": "performance requirements, suspected regressions, Core Web Vitals, N+1 queries, profiling",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/performance-optimization"
+        },
+        {
+          "name": "observability-and-instrumentation",
+          "when": "adding logging, metrics, tracing or alerting, or production issues are undiagnosable",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/observability-and-instrumentation"
+        },
+        {
+          "name": "security-and-hardening",
+          "when": "untrusted input, auth, sessions, secrets, third-party integrations, dependency audits, privacy",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/security-and-hardening"
+        }
+      ]
+    },
+    {
+      "title": "Review",
+      "skills": [
+        {
+          "name": "code-review-and-quality",
+          "when": "review one diff or pull request before it merges",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/code-review-and-quality"
+        },
+        {
+          "name": "code-review",
+          "when": "review everything since a fixed point (branch, tag, merge-base) against repo standards and the originating spec",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/code-review",
+          "plugin": "mattpocock-skills"
+        }
+      ]
+    },
+    {
+      "title": "Git, PRs and issues",
+      "skills": [
+        {
+          "name": "git-workflow-and-versioning",
+          "when": "branching, splitting a messy tree into atomic commits, conflicts, releases, semver, changelogs",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/git-workflow-and-versioning"
+        },
+        {
+          "name": "caveman-commit",
+          "when": "write a terse Conventional Commits message",
+          "repo": "JuliusBrussee/caveman",
+          "path": "skills/caveman-commit"
+        },
+        {
+          "name": "pr",
+          "when": "write a pull request body",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/pr",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "gh",
+          "when": "drive the GitHub CLI: structured output, pagination, search, `gh api`",
+          "repo": "cli/cli",
+          "path": "skills/gh"
+        },
+        {
+          "name": "triage",
+          "when": "move issues and external PRs through triage: categorise, verify, label",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/triage",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "setup-matt-pocock-skills",
+          "when": "configure a repo's issue tracker, triage labels and domain-doc layout for the Matt Pocock engineering skills",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/setup-matt-pocock-skills",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "setup-pre-commit",
+          "when": "Husky pre-commit with lint-staged, typecheck and tests, outside the `@jabraf/dev` stack",
+          "repo": "mattpocock/skills",
+          "path": "skills/misc/setup-pre-commit",
+          "plugin": "mattpocock-skills"
+        }
+      ]
+    },
+    {
+      "title": "CI and shipping",
+      "skills": [
+        {
+          "name": "ci-cd-and-automation",
+          "when": "set up or change build, test and deploy pipelines in general",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/ci-cd-and-automation"
+        },
+        {
+          "name": "jabraf-workflows-pr-checks",
+          "when": "add PR checks (test, lint, format, typecheck) via `jabranr/workflows`",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-workflows-pr-checks"
+        },
+        {
+          "name": "jabraf-workflows-npm-publish",
+          "when": "publish to npm on merge to main via `jabranr/workflows`",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-workflows-npm-publish"
+        },
+        {
+          "name": "jabraf-workflows-integration",
+          "when": "run Playwright e2e, smoke, functional or visual tests on PRs via `jabranr/workflows`",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-workflows-integration"
+        },
+        {
+          "name": "jabraf-workflows-performance-audit",
+          "when": "add a Lighthouse audit step to an existing workflow",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-workflows-performance-audit"
+        },
+        {
+          "name": "jabraf-workflows-wait-cf-pages",
+          "when": "add a step that waits for a Cloudflare Pages deployment to finish",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-workflows-wait-cf-pages"
+        },
+        {
+          "name": "shipping-and-launch",
+          "when": "pre-launch checklist, monitoring, staged rollout or rollback plan for production",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/shipping-and-launch"
+        }
+      ]
+    },
+    {
+      "title": "Docs, agent context and session",
+      "skills": [
+        {
+          "name": "documentation-and-adrs",
+          "when": "record an architecture decision (ADR) or document a public API or shipped feature",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/documentation-and-adrs"
+        },
+        {
+          "name": "writing-for-agents",
+          "when": "create or edit a skill, AGENTS.md or CLAUDE.md",
+          "repo": "mattpocock/skills",
+          "path": "skills/productivity/writing-for-agents",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "context-engineering",
+          "when": "set up rules files and context for a project, or output quality is degrading",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/context-engineering"
+        },
+        {
+          "name": "using-agent-skills",
+          "when": "general method for deciding which skill or workflow applies to a piece of work",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/using-agent-skills"
+        },
+        {
+          "name": "handoff",
+          "when": "compact the conversation into a handoff document for another agent",
+          "repo": "mattpocock/skills",
+          "path": "skills/productivity/handoff",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "retro",
+          "when": "run a retrospective on a coding session",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/retro",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "caveman",
+          "when": "the user asks for caveman mode, brevity or fewer tokens",
+          "repo": "JuliusBrussee/caveman",
+          "path": "skills/caveman"
+        },
+        {
+          "name": "git-guardrails-claude-code",
+          "when": "add Claude Code hooks that block dangerous git commands",
+          "repo": "mattpocock/skills",
+          "path": "skills/misc/git-guardrails-claude-code",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "wizard",
+          "when": "generate an interactive bash wizard for steps only a human can do",
+          "repo": "mattpocock/skills",
+          "path": "skills/engineering/wizard",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "teach",
+          "when": "teach the user a new skill or concept inside this workspace",
+          "repo": "mattpocock/skills",
+          "path": "skills/productivity/teach",
+          "plugin": "mattpocock-skills"
+        },
+        {
+          "name": "wait-what",
+          "when": "the user did not follow the last message: re-pitch it plainly",
+          "repo": "mattpocock/skills",
+          "path": "skills/productivity/wait-what",
+          "plugin": "mattpocock-skills"
+        }
+      ]
+    },
+    {
+      "title": "Frontend, design and motion",
+      "skills": [
+        {
+          "name": "frontend-ui-engineering",
+          "when": "build or change components, layouts and app UI; accessibility; state",
+          "repo": "addyosmani/agent-skills",
+          "path": "skills/frontend-ui-engineering"
+        },
+        {
+          "name": "hallmark",
+          "when": "build or design a new site or page that should look designed; an existing design only when the user names Hallmark",
+          "repo": "nutlope/hallmark",
+          "path": "skills/hallmark"
+        },
+        {
+          "name": "frontend-design",
+          "when": "distinctive, intentional visual design for new UI or a reshaped one",
+          "repo": "anthropics/claude-plugins-official",
+          "path": "plugins/frontend-design/skills/frontend-design",
+          "plugin": "frontend-design"
+        },
+        {
+          "name": "unslop",
+          "when": "turn generic, AI-looking UI into a designed interface with its own character",
+          "repo": "heydamir/unslop",
+          "path": "skills/unslop",
+          "plugin": "unslop"
+        },
+        {
+          "name": "stageshow",
+          "when": "faux product UI: mock app windows, dashboards, cursor walkthrough or demo animations",
+          "repo": "benjitaylor/skills",
+          "path": "stageshow"
+        },
+        {
+          "name": "pick-ui-library",
+          "when": "choose a library for a frontend task from a curated list",
+          "repo": "emilkowalski/skills",
+          "path": "skills/pick-ui-library"
+        },
+        {
+          "name": "animate",
+          "when": "build a new animation or transition",
+          "repo": "emilkowalski/skills",
+          "path": "skills/animate"
+        },
+        {
+          "name": "review-animations",
+          "when": "critique existing animation or motion code",
+          "repo": "emilkowalski/skills",
+          "path": "skills/review-animations"
+        },
+        {
+          "name": "improve-animations",
+          "when": "audit a whole codebase's motion and write prioritised improvement plans",
+          "repo": "emilkowalski/skills",
+          "path": "skills/improve-animations"
+        }
+      ]
+    },
+    {
+      "title": "`@jabraf` tooling",
+      "skills": [
+        {
+          "name": "jabraf-ground-rules",
+          "when": "every coding, repo, review, commit, PR or CI task in Jabran's projects: load alongside the task's skill",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-ground-rules"
+        },
+        {
+          "name": "jabraf-dev-setup",
+          "when": "full `@jabraf/dev` stack or greenfield setup; chains the granular skills below",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-dev-setup"
+        },
+        {
+          "name": "jabraf-tsconfig",
+          "when": "add or configure `tsconfig.json` from a `@jabraf/dev` preset",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-tsconfig"
+        },
+        {
+          "name": "jabraf-prettier",
+          "when": "add Prettier with the `@jabraf/dev` base",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-prettier"
+        },
+        {
+          "name": "jabraf-eslint",
+          "when": "add ESLint with the `@jabraf/dev` base",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-eslint"
+        },
+        {
+          "name": "jabraf-oxlint",
+          "when": "add oxlint with the `@jabraf/dev` base, alone or beside ESLint",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-oxlint"
+        },
+        {
+          "name": "jabraf-vitest",
+          "when": "add Vitest with `@jabraf/dev`'s `baseVitestConfig`",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-vitest"
+        },
+        {
+          "name": "jabraf-playwright",
+          "when": "add Playwright with `@jabraf/dev`'s `basePlaywrightConfig`",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-playwright"
+        },
+        {
+          "name": "jabraf-commitlint",
+          "when": "add commitlint with the `@jabraf/dev` conventional-commits base",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-commitlint"
+        },
+        {
+          "name": "jabraf-lint-staged",
+          "when": "add lint-staged and a Husky pre-commit hook with `@jabraf/dev`",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-lint-staged"
+        },
+        {
+          "name": "jabraf-app-config-setup",
+          "when": "set up `@jabraf/app-config`, feature flags, or `jabraf-config build`",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-app-config-setup"
+        }
+      ]
+    },
+    {
+      "title": "Video (Remotion)",
+      "skills": [
+        {
+          "name": "remotion-best-practices",
+          "when": "start here for any Remotion work: routes to the skills below",
+          "repo": "remotion-dev/claude-code-plugin",
+          "path": "skills/remotion-best-practices",
+          "plugin": "remotion"
+        },
+        {
+          "name": "remotion-create",
+          "when": "create a new Remotion video or project",
+          "repo": "remotion-dev/claude-code-plugin",
+          "path": "skills/remotion-create",
+          "plugin": "remotion"
+        },
+        {
+          "name": "remotion-markup",
+          "when": "write Remotion React markup: content, animation, effects",
+          "repo": "remotion-dev/claude-code-plugin",
+          "path": "skills/remotion-markup",
+          "plugin": "remotion"
+        },
+        {
+          "name": "remotion-interactivity",
+          "when": "make layers, timing and styles editable in Remotion Studio",
+          "repo": "remotion-dev/claude-code-plugin",
+          "path": "skills/remotion-interactivity",
+          "plugin": "remotion"
+        },
+        {
+          "name": "remotion-captions",
+          "when": "transcribe, display and animate captions",
+          "repo": "remotion-dev/claude-code-plugin",
+          "path": "skills/remotion-captions",
+          "plugin": "remotion"
+        },
+        {
+          "name": "remotion-maps",
+          "when": "map animations",
+          "repo": "remotion-dev/claude-code-plugin",
+          "path": "skills/remotion-maps",
+          "plugin": "remotion"
+        },
+        {
+          "name": "remotion-multimedia",
+          "when": "audio and video media through Mediabunny",
+          "repo": "remotion-dev/claude-code-plugin",
+          "path": "skills/remotion-multimedia",
+          "plugin": "remotion"
+        },
+        {
+          "name": "remotion-studio",
+          "when": "preview a video in Remotion Studio",
+          "repo": "remotion-dev/claude-code-plugin",
+          "path": "skills/remotion-studio",
+          "plugin": "remotion"
+        },
+        {
+          "name": "remotion-render",
+          "when": "export a video, still or OpenTimelineIO timeline",
+          "repo": "remotion-dev/claude-code-plugin",
+          "path": "skills/remotion-render",
+          "plugin": "remotion"
+        },
+        {
+          "name": "remotion-saas",
+          "when": "build an app around Remotion",
+          "repo": "remotion-dev/claude-code-plugin",
+          "path": "skills/remotion-saas",
+          "plugin": "remotion"
+        },
+        {
+          "name": "remotion-docs",
+          "when": "search Remotion documentation",
+          "repo": "remotion-dev/claude-code-plugin",
+          "path": "skills/remotion-docs",
+          "plugin": "remotion"
+        },
+        {
+          "name": "remotion-upgrade",
+          "when": "upgrade Remotion and related packages",
+          "repo": "remotion-dev/claude-code-plugin",
+          "path": "skills/remotion-upgrade",
+          "plugin": "remotion"
+        },
+        {
+          "name": "remotion-license",
+          "when": "Remotion licensing, terms and FAQs",
+          "repo": "remotion-dev/claude-code-plugin",
+          "path": "skills/remotion-license",
+          "plugin": "remotion"
+        }
+      ]
+    },
+    {
+      "title": "SEO and content",
+      "skills": [
+        {
+          "name": "seo-audit",
+          "when": "full SEO audit of a site or codebase",
+          "repo": "searchfit/searchfit-seo",
+          "path": "skills/seo-audit",
+          "plugin": "searchfit-seo"
+        },
+        {
+          "name": "technical-seo",
+          "when": "technical SEO: crawlability, indexing, speed, structured site issues",
+          "repo": "searchfit/searchfit-seo",
+          "path": "skills/technical-seo",
+          "plugin": "searchfit-seo"
+        },
+        {
+          "name": "on-page-seo",
+          "when": "optimise one page: title, meta, headings, content",
+          "repo": "searchfit/searchfit-seo",
+          "path": "skills/on-page-seo",
+          "plugin": "searchfit-seo"
+        },
+        {
+          "name": "schema-markup",
+          "when": "generate JSON-LD structured data for a page",
+          "repo": "searchfit/searchfit-seo",
+          "path": "skills/schema-markup",
+          "plugin": "searchfit-seo"
+        },
+        {
+          "name": "broken-links",
+          "when": "find and fix broken links",
+          "repo": "searchfit/searchfit-seo",
+          "path": "skills/broken-links",
+          "plugin": "searchfit-seo"
+        },
+        {
+          "name": "internal-linking",
+          "when": "analyse and improve internal linking",
+          "repo": "searchfit/searchfit-seo",
+          "path": "skills/internal-linking",
+          "plugin": "searchfit-seo"
+        },
+        {
+          "name": "keyword-clustering",
+          "when": "cluster keywords into topics mapped to pages",
+          "repo": "searchfit/searchfit-seo",
+          "path": "skills/keyword-clustering",
+          "plugin": "searchfit-seo"
+        },
+        {
+          "name": "content-strategy",
+          "when": "plan an SEO content strategy",
+          "repo": "searchfit/searchfit-seo",
+          "path": "skills/content-strategy",
+          "plugin": "searchfit-seo"
+        },
+        {
+          "name": "content-brief",
+          "when": "write a brief for one article or page",
+          "repo": "searchfit/searchfit-seo",
+          "path": "skills/content-brief",
+          "plugin": "searchfit-seo"
+        },
+        {
+          "name": "content-translation",
+          "when": "translate and localise content for international SEO",
+          "repo": "searchfit/searchfit-seo",
+          "path": "skills/content-translation",
+          "plugin": "searchfit-seo"
+        },
+        {
+          "name": "ai-visibility",
+          "when": "how a brand shows up in ChatGPT, Claude, Gemini and Perplexity answers",
+          "repo": "searchfit/searchfit-seo",
+          "path": "skills/ai-visibility",
+          "plugin": "searchfit-seo"
+        }
+      ]
+    }
+  ]
+}

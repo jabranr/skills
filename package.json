@@ -10,6 +10,8 @@
   },
   "scripts": {
     "skills:list": "skills add . --list",
+    "skills:index": "node scripts/skills-index/sync.mjs",
+    "skills:index:check": "node scripts/skills-index/sync.mjs --check",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
     "prepare": "husky"
@@ -19,6 +21,7 @@
   },
   "devDependencies": {
     "@jabraf/dev": "^0.1.1",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "prettier": "^3.10.1"
   }
 }

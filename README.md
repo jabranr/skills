@@ -18,6 +18,7 @@ supported agent (Claude Code, Codex, Cursor, OpenCode, and others).
 skills/
   # Baseline for every project
   jabraf-ground-rules/SKILL.md         # common rules; repos point to it from AGENTS.md
+  jabraf-skills-index/SKILL.md         # router to every skill in the library (generated catalog)
 
   # @jabraf/dev tooling
   jabraf-prettier/SKILL.md
@@ -84,6 +85,63 @@ The skill can only choose subagent models. The two `AGENT_MAIN_*` variables take
 effect only when the setup script also maps them onto the agent harness's own
 model setting. Claude Code on the web is detected through `CLAUDE_CODE_REMOTE`
 and does not need `AGENT_CLOUD_SESSION`.
+
+## One skill for the whole library
+
+`jabraf-skills-index` is a router. Install it instead of the whole library and
+it points the agent at the right skill for each task. A skill that is not
+installed is loaded on demand with `npx skills use <target>`, which fetches the
+skill and its supporting files into a temp directory without installing
+anything.
+
+```bash
+npx skills add jabranr/skills -g -a <agent> --skill jabraf-skills-index -y
+```
+
+The catalog covers:
+
+- this repo's skills
+- every third-party skill in the local `skills` CLI lock file
+  (`~/.agents/.skill-lock.json`)
+- the skills inside Claude Code plugins: ones installed from a marketplace
+  (read from `~/.claude/plugins`), plus the ones listed by hand under
+  `plugins` in `scripts/skills-index/catalog.json`. Plugins synced from a
+  claude.ai account do not record their GitHub repo locally, so they go in that
+  list.
+
+Groups and the "when to use" lines are curated in
+`scripts/skills-index/catalog.json`. The sync shallow-clones each source repo,
+so skill paths and default branches come from the repo itself, and a skill that
+moved upstream is picked up at its new path. It then renders two files from the
+catalog: the catalog block in `SKILL.md` and `.claude-plugin/marketplace.json`.
+
+```bash
+npm run skills:index              # pick up new or removed skills and plugins, then re-render
+npm run skills:index -- --prune   # also drop entries that were not discovered
+npm run skills:index:check        # CI: fail if either output is out of date with catalog.json
+```
+
+A new skill lands in an "Unsorted" group, with its description's first sentence
+as the "when" line. Move it into a group and rewrite that line. To leave a
+skill out, add it to `skip`. Targets track each source repo's default branch,
+because `skills use` cannot pin to a commit.
+
+## Claude Code plugin marketplace
+
+This repo is also a Claude Code marketplace (`jabraf`). It offers this repo's
+skills as the `jabraf-skills` plugin, together with every plugin in the
+catalog. Each one points to its own upstream repo, so plugins install with
+their agents, commands, hooks and MCP servers, which the skills index cannot
+load.
+
+```
+/plugin install jabraf-skills --marketplace jabranr/skills
+/plugin install searchfit-seo --marketplace jabranr/skills
+```
+
+The one-step `--marketplace` form needs Claude Code 2.1.275 or later. On older
+versions, run `/plugin marketplace add jabranr/skills` first, then
+`/plugin install <plugin>@jabraf`.
 
 ## Install
 
