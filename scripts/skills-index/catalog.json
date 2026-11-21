@@ -52,7 +52,8 @@
     "microsoft/playwright-cli": { "branch": "main" },
     "nutlope/hallmark": { "branch": "main" },
     "remotion-dev/claude-code-plugin": { "branch": "main" },
-    "searchfit/searchfit-seo": { "branch": "main" }
+    "searchfit/searchfit-seo": { "branch": "main" },
+    "secure-ci/cli": { "branch": "main" }
   },
   "groups": [
     {
@@ -390,6 +391,12 @@
           "when": "add a step that waits for a Cloudflare Pages deployment to finish",
           "repo": "jabranr/skills",
           "path": "skills/jabraf-workflows-wait-cf-pages"
+        },
+        {
+          "name": "secureci",
+          "when": "create, edit, validate, run locally or pin/lock GitHub Actions workflows with `@secureci/cli`; use instead of actionlint",
+          "repo": "secure-ci/cli",
+          "path": "skills/secureci"
         },
         {
           "name": "shipping-and-launch",

@@ -154,6 +154,7 @@ Format: `name`: when to use it. `target`
 - `jabraf-workflows-integration`: run Playwright e2e, smoke, functional or visual tests on PRs via `jabranr/workflows`. `https://github.com/jabranr/skills/tree/main/skills/jabraf-workflows-integration`
 - `jabraf-workflows-performance-audit`: add a Lighthouse audit step to an existing workflow. `https://github.com/jabranr/skills/tree/main/skills/jabraf-workflows-performance-audit`
 - `jabraf-workflows-wait-cf-pages`: add a step that waits for a Cloudflare Pages deployment to finish. `https://github.com/jabranr/skills/tree/main/skills/jabraf-workflows-wait-cf-pages`
+- `secureci`: create, edit, validate, run locally or pin/lock GitHub Actions workflows with `@secureci/cli`; use instead of actionlint. `https://github.com/secure-ci/cli/tree/main/skills/secureci`
 - `shipping-and-launch`: pre-launch checklist, monitoring, staged rollout or rollback plan for production. `https://github.com/addyosmani/agent-skills/tree/main/skills/shipping-and-launch`
 
 ### Docs, agent context and session
