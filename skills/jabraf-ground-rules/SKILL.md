@@ -168,6 +168,19 @@ projects keep their platform; suggest a move only as a follow-up.
   Playwright functional/e2e → `*.spec.ts`. Test files sit beside their source and
   mirror its name.
 
+### Driving a browser
+
+- To open, click through, snapshot or screenshot a page by hand (checking a UI
+  change, reproducing a bug, exploring a flow), use `playwright-cli` rather
+  than a Playwright MCP server. It saves snapshots to files instead of
+  returning them on every step, so it costs far fewer tokens. Load the
+  `playwright-cli` skill for its commands.
+- Run it as `playwright-cli`. When that command is missing, use
+  `npx playwright cli` if the repo has Playwright 1.59 or newer, and otherwise
+  ask before installing `@playwright/cli` globally.
+- Behaviour you verify this way that should stay working goes into a
+  Playwright test, per the rules above.
+
 ## 5. The gate (before calling anything done)
 
 Run the repo's equivalents of, and report each result:
@@ -204,8 +217,9 @@ tool manager chosen in section 2.
 ### gh and GitHub
 
 - Use the `gh` CLI for GitHub repos, issues, PRs and links in the user's own
-  repos, rather than fetching the web page. Cloud sessions without `gh` use
-  the platform's GitHub tools (section 11).
+  repos, rather than fetching the web page or calling a GitHub MCP server. The
+  `gh` skill covers structured output, pagination, search and `gh api`. Cloud
+  sessions without `gh` use the platform's GitHub tools (section 11).
 - Use `github.com` / `api.github.com` for every `gh` and API call, even when a
   git remote uses an SSH host alias.
 

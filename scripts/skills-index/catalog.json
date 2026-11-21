@@ -49,6 +49,7 @@
     "heydamir/unslop": { "branch": "main" },
     "jabranr/skills": { "branch": "main" },
     "mattpocock/skills": { "branch": "main" },
+    "microsoft/playwright-cli": { "branch": "main" },
     "nutlope/hallmark": { "branch": "main" },
     "remotion-dev/claude-code-plugin": { "branch": "main" },
     "searchfit/searchfit-seo": { "branch": "main" }
@@ -255,6 +256,12 @@
           "when": "inspect DOM, console, network or performance in a real browser via Chrome DevTools MCP",
           "repo": "addyosmani/agent-skills",
           "path": "skills/browser-testing-with-devtools"
+        },
+        {
+          "name": "playwright-cli",
+          "when": "drive a real browser from the shell: open, click, fill, snapshot or screenshot a page; use instead of a Playwright MCP server",
+          "repo": "microsoft/playwright-cli",
+          "path": "skills/playwright-cli"
         },
         {
           "name": "performance-optimization",

@@ -60,6 +60,10 @@ counts as an installed skill.
   from what `to-spec` produced, and `implement` builds from any spec or
   tickets. Whichever builds, `incremental-implementation` sets the size of each
   slice.
+- **Browser:** `playwright-cli` is the default for driving a page (open,
+  click, fill, snapshot). Use `browser-testing-with-devtools` for DevTools
+  work such as network, console and performance profiling. Prefer both over
+  a Playwright MCP server, and prefer `gh` over a GitHub MCP server.
 - **Architecture:** `codebase-design` designs a single module.
   `improve-codebase-architecture` scans the whole codebase for improvements.
 - **UI:** `hallmark` is for new sites and pages. `frontend-ui-engineering` is
@@ -122,6 +126,7 @@ Format: `name`: when to use it. `target`
 - `debugging-and-error-recovery`: a test fails, a build breaks, or behaviour does not match expectations. `https://github.com/addyosmani/agent-skills/tree/main/skills/debugging-and-error-recovery`
 - `diagnosing-bugs` (plugin `mattpocock-skills`): a hard bug or performance regression that needs a disciplined diagnosis loop. `https://github.com/mattpocock/skills/tree/main/skills/engineering/diagnosing-bugs`
 - `browser-testing-with-devtools`: inspect DOM, console, network or performance in a real browser via Chrome DevTools MCP. `https://github.com/addyosmani/agent-skills/tree/main/skills/browser-testing-with-devtools`
+- `playwright-cli`: drive a real browser from the shell: open, click, fill, snapshot or screenshot a page; use instead of a Playwright MCP server. `https://github.com/microsoft/playwright-cli/tree/main/skills/playwright-cli`
 - `performance-optimization`: performance requirements, suspected regressions, Core Web Vitals, N+1 queries, profiling. `https://github.com/addyosmani/agent-skills/tree/main/skills/performance-optimization`
 - `observability-and-instrumentation`: adding logging, metrics, tracing or alerting, or production issues are undiagnosable. `https://github.com/addyosmani/agent-skills/tree/main/skills/observability-and-instrumentation`
 - `security-and-hardening`: untrusted input, auth, sessions, secrets, third-party integrations, dependency audits, privacy. `https://github.com/addyosmani/agent-skills/tree/main/skills/security-and-hardening`
