@@ -171,7 +171,16 @@ function discover() {
     add(s.name, { repo: s.repo, path });
   }
 
-  for (const [plugin, source] of Object.entries(installedPlugins())) {
+  for (const [plugin, installed] of Object.entries(installedPlugins())) {
+    const current = catalog.plugins[plugin]?.source;
+    const loc = (s) => s && sourceRepo(s);
+    const same =
+      loc(current) && loc(installed)?.repo === loc(current).repo && loc(installed).path === loc(current).path;
+    // Keep the catalog's source when it points at the same place. Marketplaces pin plugins to a
+    // commit (`sha`/`ref`) and bump it often; carrying that pin over would churn the catalog and
+    // hold this marketplace back at whatever commit happens to be installed locally.
+    if (same) continue;
+    const { sha, ref, ...source } = installed;
     catalog.plugins[plugin] = { ...catalog.plugins[plugin], source };
   }
   for (const [plugin, cfg] of Object.entries(catalog.plugins)) {
