@@ -44,9 +44,10 @@ skills/
   # Jabran's SEO loop (scheduled tasks + OpenSEO MCP; each site keeps only seo.config.yaml)
   jabraf-seo-setup/SKILL.md            # onboarding, schedules, migration from old kit copies
     seo.config.example.yaml            # every config key the loop reads
-    templates/                         # issue templates and seo-labels.json
+    templates/seo-labels.json          # GitHub labels for the loop
   jabraf-seo-research/SKILL.md         # weekly: opportunities -> seo:brief issues
   jabraf-seo-brief/SKILL.md            # one opportunity -> writer brief
+    templates/                         # seo:brief and seo:refresh issue templates
   jabraf-seo-writer/SKILL.md           # issue -> branch -> draft PR
   jabraf-seo-qa/SKILL.md               # review, merge gates, promote, publish
     scripts/seo-lint*.mjs              # zero-dependency lint for built HTML (npm test)

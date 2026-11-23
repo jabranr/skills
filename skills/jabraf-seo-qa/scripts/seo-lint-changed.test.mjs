@@ -91,3 +91,18 @@ test('parseYaml reads a cadence ramp written as a list of inline maps', () => {
     { from: '2027-01-05', new_pages_per_week: 1, weekly_credit_budget: 800 },
   ]);
 });
+
+test('parseYaml skips block scalars with chomping indicators', () => {
+  for (const indicator of ['|', '>', '|-', '>-', '|+', '>+']) {
+    const cfg = parseYaml(
+      [
+        'goal:',
+        '  attribution:',
+        `    how_to_query: ${indicator}`,
+        '      SELECT first_landing_path: path FROM user',
+        '    first_touch_recorded: true',
+      ].join('\n')
+    );
+    assert.deepEqual(cfg.goal.attribution, { how_to_query: '', first_touch_recorded: true }, indicator);
+  }
+});

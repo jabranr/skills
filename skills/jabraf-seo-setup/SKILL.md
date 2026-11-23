@@ -27,8 +27,8 @@ convert and feeds weights back to research.
 | `jabraf-seo-conversion` | monthly task    | a weights PR and a report                 |
 
 Labels and colours: [`templates/seo-labels.json`](templates/seo-labels.json). Issue shapes:
-[`templates/issue/seo-brief.md`](templates/issue/seo-brief.md) and
-[`templates/issue/seo-refresh.md`](templates/issue/seo-refresh.md). Every config key is described
+the `templates/` directory of `jabraf-seo-brief` (load it the way this skill was loaded, skill
+name swapped, to read them). Every config key is described
 in [`seo.config.example.yaml`](seo.config.example.yaml).
 
 Each skill posts its run summary on the repo's pinned tracking issue, titled exactly

@@ -9,12 +9,8 @@ Input: a target query (new-page mode) or a URL plus its queries (refresh mode), 
 effective weekly credit budget. Output: the issue body, filled in the shape of the template for
 the mode, ready for the caller to open.
 
-The templates live in `jabraf-seo-setup`. Fetch the one for the mode from the same ref this skill
-was loaded from (`seo-loop-v1` for scheduled tasks; `main` when installed locally):
-
-- New page: `https://raw.githubusercontent.com/jabranr/skills/<ref>/skills/jabraf-seo-setup/templates/issue/seo-brief.md`
-- Refresh: `https://raw.githubusercontent.com/jabranr/skills/<ref>/skills/jabraf-seo-setup/templates/issue/seo-refresh.md`
-
+Templates: [`templates/seo-brief.md`](templates/seo-brief.md) for a new page,
+[`templates/seo-refresh.md`](templates/seo-refresh.md) for a refresh.
 Use the template's body (below its frontmatter) as the issue body and its `title` pattern as the
 issue title.
 

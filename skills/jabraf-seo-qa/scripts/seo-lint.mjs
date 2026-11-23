@@ -78,7 +78,7 @@ export function parseYaml(text) {
     const key = t.slice(0, k).trim();
     const rest = t.slice(k + 1).trim();
     const container = top.node;
-    if (rest === '|' || rest === '>') {
+    if (/^[|>][-+]?$/.test(rest)) {
       container[key] = '';
       block = indent;
       continue;
