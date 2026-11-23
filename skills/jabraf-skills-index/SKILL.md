@@ -74,6 +74,10 @@ counts as an installed skill.
   sibling such as `./remotion-create/`, load that skill from this index.
 - **Motion:** `animate` builds an animation. `review-animations` critiques
   existing motion code. `improve-animations` audits the whole codebase.
+- **SEO:** in a repo with `seo.config.yaml`, the `jabraf-seo-*` skills run
+  Jabran's SEO loop (issues, PRs, schedules), and `jabraf-seo-audit` is its
+  weekly audit. The `searchfit-seo` skills, `seo-audit` among them, are
+  one-off audits and optimisations for any site.
 - **CI:** `ci-cd-and-automation` covers pipelines in general. The
   `jabraf-workflows-*` skills wire up `jabranr/workflows`, so use them first in
   Jabran's repos.
@@ -212,6 +216,17 @@ Format: `name`: when to use it. `target`
 - `remotion-docs` (plugin `remotion`): search Remotion documentation. `https://github.com/remotion-dev/claude-code-plugin/tree/main/skills/remotion-docs`
 - `remotion-upgrade` (plugin `remotion`): upgrade Remotion and related packages. `https://github.com/remotion-dev/claude-code-plugin/tree/main/skills/remotion-upgrade`
 - `remotion-license` (plugin `remotion`): Remotion licensing, terms and FAQs. `https://github.com/remotion-dev/claude-code-plugin/tree/main/skills/remotion-license`
+
+### SEO loop
+
+- `jabraf-seo-setup`: onboard a repo to Jabran's SEO loop, migrate it off old kit copies, or create its SEO scheduled tasks. `https://github.com/jabranr/skills/tree/main/skills/jabraf-seo-setup`
+- `jabraf-seo-research`: weekly SEO loop research: Search Console and OpenSEO opportunities into `seo:brief` issues. `https://github.com/jabranr/skills/tree/main/skills/jabraf-seo-research`
+- `jabraf-seo-brief`: turn one SEO loop opportunity (query or URL) into a writer brief; used by research and audit. `https://github.com/jabranr/skills/tree/main/skills/jabraf-seo-brief`
+- `jabraf-seo-writer`: write or rewrite one page from an `seo:*` issue and open a draft PR. `https://github.com/jabranr/skills/tree/main/skills/jabraf-seo-writer`
+- `jabraf-seo-qa`: QA SEO loop draft PRs, then merge, promote and publish when the merge gates hold; holds seo-lint. `https://github.com/jabranr/skills/tree/main/skills/jabraf-seo-qa`
+- `jabraf-seo-publish`: after an SEO loop PR is merged and deployed: verify live, submit for indexing, close the issue. `https://github.com/jabranr/skills/tree/main/skills/jabraf-seo-publish`
+- `jabraf-seo-audit`: weekly SEO loop audit of existing pages into `seo:refresh` and `seo:technical` issues. `https://github.com/jabranr/skills/tree/main/skills/jabraf-seo-audit`
+- `jabraf-seo-conversion`: monthly SEO loop conversion analysis that updates research weights in `seo.config.yaml`. `https://github.com/jabranr/skills/tree/main/skills/jabraf-seo-conversion`
 
 ### SEO and content
 

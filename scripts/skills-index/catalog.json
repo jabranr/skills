@@ -713,6 +713,59 @@
       ]
     },
     {
+      "title": "SEO loop",
+      "skills": [
+        {
+          "name": "jabraf-seo-setup",
+          "when": "onboard a repo to Jabran's SEO loop, migrate it off old kit copies, or create its SEO scheduled tasks",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-seo-setup"
+        },
+        {
+          "name": "jabraf-seo-research",
+          "when": "weekly SEO loop research: Search Console and OpenSEO opportunities into `seo:brief` issues",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-seo-research"
+        },
+        {
+          "name": "jabraf-seo-brief",
+          "when": "turn one SEO loop opportunity (query or URL) into a writer brief; used by research and audit",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-seo-brief"
+        },
+        {
+          "name": "jabraf-seo-writer",
+          "when": "write or rewrite one page from an `seo:*` issue and open a draft PR",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-seo-writer"
+        },
+        {
+          "name": "jabraf-seo-qa",
+          "when": "QA SEO loop draft PRs, then merge, promote and publish when the merge gates hold; holds seo-lint",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-seo-qa"
+        },
+        {
+          "name": "jabraf-seo-publish",
+          "when": "after an SEO loop PR is merged and deployed: verify live, submit for indexing, close the issue",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-seo-publish"
+        },
+        {
+          "name": "jabraf-seo-audit",
+          "when": "weekly SEO loop audit of existing pages into `seo:refresh` and `seo:technical` issues",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-seo-audit"
+        },
+        {
+          "name": "jabraf-seo-conversion",
+          "when": "monthly SEO loop conversion analysis that updates research weights in `seo.config.yaml`",
+          "repo": "jabranr/skills",
+          "path": "skills/jabraf-seo-conversion"
+        }
+      ]
+    },
+    {
       "title": "SEO and content",
       "skills": [
         {

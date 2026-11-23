@@ -14,7 +14,8 @@
     "skills:index:check": "node scripts/skills-index/sync.mjs --check",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "node --test skills/*/scripts/*.test.mjs"
   },
   "dependencies": {
     "skills": "^1.5.12"
