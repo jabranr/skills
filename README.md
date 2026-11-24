@@ -60,8 +60,10 @@ Keep repo docs to what is specific to that repo; change shared rules here.
 ### Cloud sessions
 
 Section 11 of `jabraf-ground-rules` covers agent cloud sessions (e.g. Claude Code
-on the web): git identity, pushing so work is not lost, a main agent that plans
-and delegates implementation to subagents, and model choices. A cloud
+on the web): git identity, pushing so work is not lost, model choices, and an
+opt-in main + subagents mode where the main agent plans and delegates
+implementation to subagents. By default a cloud session works as a single agent;
+the main + subagents mode runs only when you ask for it in the session. A cloud
 environment's setup script can fetch the file as base instructions:
 
 ```
@@ -78,7 +80,7 @@ Variables the setup script can set:
 | `AGENT_CLOUD_SESSION`           | `1` marks the session as a cloud session       | unset              |
 | `AGENT_MAIN_MODEL`              | Main agent model                               | `claude-fable-5-2` |
 | `AGENT_MAIN_FALLBACK_MODEL`     | Main agent model when the first is unavailable | `claude-opus-5-5`  |
-| `AGENT_SUBAGENT_MODEL`          | Subagent model                                 | `claude-opus-5-5`  |
+| `AGENT_SUBAGENT_MODEL`          | Subagent model (main + subagents mode only)    | `claude-opus-5-5`  |
 | `AGENT_SUBAGENT_FALLBACK_MODEL` | Subagent model when the first is unavailable   | `claude-haiku-5-5` |
 
 The skill can only choose subagent models. The two `AGENT_MAIN_*` variables take

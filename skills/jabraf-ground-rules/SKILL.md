@@ -1,6 +1,6 @@
 ---
 name: jabraf-ground-rules
-description: Jabran's ground rules for every project — how to work (clarify first, stay scoped, report real results) plus default stack (Cloudflare, Tailwind v4), TypeScript, testing, git/PR, gh, CI, security and docs conventions, and the cloud-session rules (git identity, plan-only main agent, model choices). Load at the start of any coding, repo, review, commit, PR or GitHub Actions task, and whenever a repo's AGENTS.md points to it or is silent on a convention.
+description: Jabran's ground rules for every project — how to work (clarify first, stay scoped, report real results) plus default stack (Cloudflare, Tailwind v4), TypeScript, testing, git/PR, gh, CI, security and docs conventions, and the cloud-session rules (git identity, main + subagents mode only when asked, model choices). Load at the start of any coding, repo, review, commit, PR or GitHub Actions task, and whenever a repo's AGENTS.md points to it or is silent on a convention.
 ---
 
 # `jabraf-ground-rules`
@@ -358,14 +358,24 @@ default when it is not.
   model setting. Check which model is serving the session where the harness
   lets you. If it is neither the main model nor its fallback, say so in your
   first reply and carry on.
-- **Subagents.** Pass the subagent model explicitly on every spawn. When a spawn
+- **Subagents.** Applies only in main + subagents mode. Pass the subagent
+  model explicitly on every spawn. When a spawn
   fails because that model is unavailable, retry once with the fallback and
   tell the user at that point, naming the task and the model, rather than
   leaving it for the final summary.
 
-### Main agent: plan, delegate, guide
+### Default: work as a single agent
 
-The main agent plans and coordinates, and subagents implement.
+By default a cloud session works like a local one: follow sections 1 to 10 and
+do the work yourself, with the git rules above. Do not spawn subagents or switch
+to main + subagents mode on your own judgement.
+
+### Main + subagents mode (only when asked)
+
+Use this mode only when the user explicitly asks for it in the session, e.g.
+"use subagents", "plan and delegate" or "main + subagents". The ask covers the
+rest of the session unless the user says otherwise. In this mode the main agent
+plans and coordinates, and subagents implement.
 
 **The one exception: a small ask that needs no questions.** Do the work yourself
 only when both hold:
@@ -448,4 +458,4 @@ from `ai-docs/` without the user asking.
 - [ ] No secrets, generated files, local state or `ai-docs/` references staged.
 - [ ] Docs updated where behaviour, commands or setup changed.
 - [ ] Committed on a feature branch; nothing pushed unless asked (cloud sessions: branch pushed).
-- [ ] In a cloud session: work delegated unless it met the small-ask exception, full gate run on the combined result, summary given.
+- [ ] In a cloud session in main + subagents mode (only when asked): work delegated unless it met the small-ask exception, full gate run on the combined result, summary given.
