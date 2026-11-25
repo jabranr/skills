@@ -188,7 +188,7 @@ Format: `name`: when to use it. `target`
 - `jabraf-ground-rules`: every coding, repo, review, commit, PR or CI task in Jabran's projects: load alongside the task's skill. `https://github.com/jabranr/skills/tree/main/skills/jabraf-ground-rules`
 - `jabraf-dev-setup`: full `@jabraf/dev` stack or greenfield setup; chains the granular skills below. `https://github.com/jabranr/skills/tree/main/skills/jabraf-dev-setup`
 - `jabraf-tsconfig`: add or configure `tsconfig.json` from a `@jabraf/dev` preset. `https://github.com/jabranr/skills/tree/main/skills/jabraf-tsconfig`
-- `jabraf-prettier`: add Prettier with the `@jabraf/dev` base. `https://github.com/jabranr/skills/tree/main/skills/jabraf-prettier`
+- `jabraf-prettier`: add Prettier with the `@jabraf/dev` base, or fix/migrate legacy `@jabraf/prettier`. `https://github.com/jabranr/skills/tree/main/skills/jabraf-prettier`
 - `jabraf-eslint`: add ESLint with the `@jabraf/dev` base. `https://github.com/jabranr/skills/tree/main/skills/jabraf-eslint`
 - `jabraf-oxlint`: add oxlint with the `@jabraf/dev` base, alone or beside ESLint. `https://github.com/jabranr/skills/tree/main/skills/jabraf-oxlint`
 - `jabraf-vitest`: add Vitest with `@jabraf/dev`'s `baseVitestConfig`. `https://github.com/jabranr/skills/tree/main/skills/jabraf-vitest`
