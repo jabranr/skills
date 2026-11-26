@@ -160,14 +160,16 @@ queries. Plan on about 3 months before judging conversions; judge indexing and i
 - name: seo-lint changed pages
   env:
     BASE_REF: ${{ github.base_ref }}
-  run: node "$RUNNER_TEMP/seo-lint/seo-lint-changed.mjs" "origin/$BASE_REF" --config seo.config.yaml
+  run: node "$RUNNER_TEMP/seo-lint/seo-lint-changed.mjs" "origin/$BASE_REF" --config seo.config.yaml --build-base
 ```
 
-Without `--base-dist`, every changed page is held to `audience.reading_level_max_grade`, so a
-refresh of a page already over the cap fails until it reaches the cap. To let refreshes pass when
-they drop 1.5 grades or more, build the base ref into its own directory (for example
-`git worktree add "$RUNNER_TEMP/base" "origin/$BASE_REF"`, install and build there) and add
-`--base-dist "$RUNNER_TEMP/base/<build.output_dir>"` to the command.
+This is the recommended call; the checkout needs `fetch-depth: 0`. `--build-base` builds the base
+ref in a temporary `git worktree` (`build.install`, then `build.build`, with the step's environment,
+so set build-time variables such as `APP_HOSTNAME` on the step) and removes it afterwards. It builds
+only when a published page changed. Then seo-lint compares each refreshed page with its base
+version: one over `audience.reading_level_max_grade` passes when at least 1.5 grades lower, while
+new pages are held to the cap. Without `--build-base` (or `--base-dist <dir>` for a base you built
+yourself), every changed page is held to the cap.
 
 The step needs Node 18 or newer and no install. With `auto_merge.enabled`, this CI run is one of the
 checks QA requires green before it merges.

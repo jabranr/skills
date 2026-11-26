@@ -117,8 +117,8 @@ still not live on `site.base_url` stay `seo:review`; the next run retries them.
   build passes when 1.5 or more grades below its base grade (a warning naming both); pages missing
   there are new and held to the cap. Without it, every page is held to the cap.
 - [`scripts/seo-lint-changed.mjs`](scripts/seo-lint-changed.mjs):
-  `<base-ref> [--config] [--out] [--base-dist]`; lints only the pages changed since the base ref,
-  mapped through `seo_lint.pages` (or `content.*`), passing `--base-dist` on to seo-lint. Used in
+  `<base-ref> [--config] [--out] [--build-base | --base-dist]`; lints only the pages changed since the base ref,
+  mapped through `seo_lint.pages` (or `content.*`), passing `--base-dist` on to seo-lint; `--build-base` builds the base ref in a temporary worktree and uses that. Used in
   CI; see `jabraf-seo-setup` for the pinned fetch step.
 
 Both need Node 18 or newer and no dependencies. Tests: `npm test` in `jabranr/skills`.

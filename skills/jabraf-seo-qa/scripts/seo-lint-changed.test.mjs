@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { pageRules, pagesToLint } from './seo-lint-changed.mjs';
-import { CONFIG, HARD, MEDIUM, writePage } from './seo-lint.fixtures.mjs';
+import { CONFIG, EASY, HARD, MEDIUM, page, writePage } from './seo-lint.fixtures.mjs';
 import { parseYaml } from './seo-lint.mjs';
 
 // A static site with pages at the repo root and in folders (the SecureCI layout).
@@ -151,5 +151,98 @@ test('seo-lint-changed --base-dist lets a refresh pass by dropping 1.5 grades bu
 test('seo-lint-changed without --base-dist keeps the CI call working and holds pages to the cap', () => {
   const res = prRepo()('main', '--config', 'seo.config.yaml');
   assert.equal(res.status, 1, res.stdout);
+  assert.match(res.stdout, /2 page\(s\) checked, 2 failed/);
+});
+
+// Copies blog/<slug>.html to dist/blog/<slug>/index.html; needs APP_HOSTNAME, like a CI build would.
+const BUILD_SCRIPT = `
+import { cpSync, mkdirSync, readdirSync } from 'node:fs';
+if (!process.env.APP_HOSTNAME) { console.error('APP_HOSTNAME unset'); process.exit(3); }
+console.log('built for ' + process.env.APP_HOSTNAME);
+for (const f of readdirSync('blog')) {
+  const slug = f.replace(/\\.html$/, '');
+  mkdirSync('dist/blog/' + slug, { recursive: true });
+  cpSync('blog/' + f, 'dist/blog/' + slug + '/index.html');
+}
+`;
+
+/**
+ * A git repo with a real (trivial) build: the PR branch refreshes blog/old.html (hard → medium)
+ * and adds blog/new.html (medium), and the PR's dist/ is built. `edit` changes the PR commit.
+ */
+function buildRepo({ install = 'node -e "console.log(\'installed\')"', edit } = {}) {
+  const dir = mkdtempSync(join(tmpdir(), 'seo-lint-build-'));
+  const git = (...args) =>
+    execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { cwd: dir, encoding: 'utf8' });
+  const config = [
+    CONFIG,
+    'build:',
+    `  install: ${install}`,
+    '  build: node build.mjs',
+    '  output_dir: dist',
+    'seo_lint:',
+    '  pages:',
+    "    - { source: 'blog/{slug}.html', url: '/blog/{slug}/' }",
+  ].join('\n');
+  writeFileSync(join(dir, 'seo.config.yaml'), config);
+  writeFileSync(join(dir, 'build.mjs'), BUILD_SCRIPT);
+  writeFileSync(join(dir, '.gitignore'), 'dist/\n');
+  mkdirSync(join(dir, 'blog'));
+  writeFileSync(join(dir, 'blog/old.html'), page('old', HARD));
+  writeFileSync(join(dir, 'blog/easy.html'), page('easy', EASY));
+  git('init', '-q', '-b', 'main');
+  git('add', '.');
+  git('commit', '-qm', 'base');
+  git('checkout', '-qb', 'pr');
+  if (edit) edit(dir);
+  else {
+    writeFileSync(join(dir, 'blog/old.html'), page('old', MEDIUM));
+    writeFileSync(join(dir, 'blog/new.html'), page('new', MEDIUM));
+  }
+  git('add', '.');
+  git('commit', '-qm', 'pr', '--allow-empty');
+  const env = { ...process.env, APP_HOSTNAME: 'example.com' };
+  execFileSync(process.execPath, ['build.mjs'], { cwd: dir, env });
+  return {
+    git,
+    run: (...args) => spawnSync(process.execPath, [CHANGED, ...args], { cwd: dir, encoding: 'utf8', env }),
+  };
+}
+
+const worktrees = (git) => git('worktree', 'list').trim().split('\n').length;
+
+test('seo-lint-changed --build-base builds the base in a worktree, compares against it, then removes it', () => {
+  const { git, run } = buildRepo();
+  const res = run('main', '--config', 'seo.config.yaml', '--build-base');
+  assert.equal(res.status, 1, res.stdout + res.stderr);
+  assert.match(res.stdout, /installed\n/);
+  assert.match(res.stdout, /built for example\.com/);
+  assert.match(res.stdout, /\/blog\/old\/\n {2}⚠ reading grade [\d.]+ \(> 8\), base [\d.]+/);
+  assert.match(res.stdout, /\/blog\/new\/\n {2}✖ reading grade [\d.]+ \(> 8\)/);
+  assert.match(res.stdout, /2 page\(s\) checked, 1 failed/);
+  assert.equal(worktrees(git), 1);
+});
+
+test('seo-lint-changed --build-base skips the base build when no published page changed', () => {
+  const { git, run } = buildRepo({ edit: (dir) => writeFileSync(join(dir, 'README.md'), 'hi') });
+  const res = run('main', '--config', 'seo.config.yaml', '--build-base');
+  assert.equal(res.status, 0, res.stdout + res.stderr);
+  assert.doesNotMatch(res.stdout, /installed|built for/);
+  assert.equal(worktrees(git), 1);
+});
+
+test('seo-lint-changed --build-base fails clearly when the base install fails, and removes the worktree', () => {
+  const { git, run } = buildRepo({ install: 'node -e "process.exit(4)"' });
+  const res = run('main', '--config', 'seo.config.yaml', '--build-base');
+  assert.equal(res.status, 1);
+  assert.match(res.stderr, /seo-lint-changed: base build failed: build\.install .* exited 4/);
+  assert.doesNotMatch(res.stdout, /reading grade/);
+  assert.equal(worktrees(git), 1);
+});
+
+test('seo-lint-changed --base-dist wins over --build-base', () => {
+  const { run } = buildRepo();
+  const res = run('main', '--config', 'seo.config.yaml', '--build-base', '--base-dist', 'dist');
+  assert.doesNotMatch(res.stdout, /installed|built for/);
   assert.match(res.stdout, /2 page\(s\) checked, 2 failed/);
 });
