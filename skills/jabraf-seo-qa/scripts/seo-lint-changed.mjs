@@ -5,7 +5,12 @@
 //
 // Usage:
 //   node seo-lint-changed.mjs <base-ref> [--config seo.config.yaml] [--out <build output dir>]
+//                             [--base-dist <base build output dir>]
 //
+// --base-dist is the site built from <base-ref> (for example in a `git worktree`). It is passed to
+// seo-lint, which then lets a refreshed page over audience.reading_level_max_grade pass when it is
+// at least 1.5 grades below its base version; new pages stay held to the cap. Without it, every
+// changed page is held to the cap.
 // Changed source files map to URL paths through `seo_lint.pages` in seo.config.yaml, a list of
 // `{ source, url }` rules where the first matching rule wins:
 //   - source: a repo-relative path pattern. `{slug}` matches one path segment, `{path}` one or
@@ -76,10 +81,13 @@ export function pagesToLint(changedFiles, rules) {
 
 function main(args) {
   const flag = (name) => (args.includes(name) ? args[args.indexOf(name) + 1] : undefined);
-  const base = args.find((a, i) => !a.startsWith('--') && !['--config', '--out'].includes(args[i - 1]));
+  const base = args.find((a, i) => !a.startsWith('--') && !['--config', '--out', '--base-dist'].includes(args[i - 1]));
   const configPath = flag('--config') ?? 'seo.config.yaml';
+  const baseDist = flag('--base-dist');
   if (!base || !existsSync(configPath)) {
-    console.error('usage: seo-lint-changed.mjs <base-ref> [--config seo.config.yaml] [--out <dir>]');
+    console.error(
+      'usage: seo-lint-changed.mjs <base-ref> [--config seo.config.yaml] [--out <dir>] [--base-dist <dir>]'
+    );
     process.exit(2);
   }
   const cfg = parseYaml(readFileSync(configPath, 'utf8'));
@@ -95,7 +103,11 @@ function main(args) {
     process.exit(0);
   }
   const lint = (extra) =>
-    spawnSync(process.execPath, [SEO_LINT, outDir, '--config', configPath, ...extra], { stdio: 'inherit' }).status;
+    spawnSync(
+      process.execPath,
+      [SEO_LINT, outDir, '--config', configPath, ...(baseDist ? ['--base-dist', baseDist] : []), ...extra],
+      { stdio: 'inherit' }
+    ).status;
   if (pages[0] === '*') process.exit(lint([]) === 0 ? 0 : 1);
   let failed = 0;
   for (const page of pages) if (lint(['--only', page]) !== 0) failed++;

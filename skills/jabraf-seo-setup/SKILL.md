@@ -91,6 +91,8 @@ queries. Plan on about 3 months before judging conversions; judge indexing and i
    names, `audience`, `voice` (including `voice.rules` and `facts.forbidden_claims`), competitors,
    weekly credit budget, whether `auto_merge` is on and its `allowed_paths`, and the starting
    cadence (`cadence.ramp` for a dated ramp; `new_pages_per_week: 0` for a refresh-only start).
+   Set `audience.reading_level_max_grade` to the grade the target audience reads at, not the
+   site's current average: new pages must meet it, and the audit brings old pages down to it.
    Done when every key in the example is set or deliberately empty.
 
 4. **Sync OpenSEO context.** `get_project_context`; fill missing sections with
@@ -160,6 +162,12 @@ queries. Plan on about 3 months before judging conversions; judge indexing and i
     BASE_REF: ${{ github.base_ref }}
   run: node "$RUNNER_TEMP/seo-lint/seo-lint-changed.mjs" "origin/$BASE_REF" --config seo.config.yaml
 ```
+
+Without `--base-dist`, every changed page is held to `audience.reading_level_max_grade`, so a
+refresh of a page already over the cap fails until it reaches the cap. To let refreshes pass when
+they drop 1.5 grades or more, build the base ref into its own directory (for example
+`git worktree add "$RUNNER_TEMP/base" "origin/$BASE_REF"`, install and build there) and add
+`--base-dist "$RUNNER_TEMP/base/<build.output_dir>"` to the command.
 
 The step needs Node 18 or newer and no install. With `auto_merge.enabled`, this CI run is one of the
 checks QA requires green before it merges.

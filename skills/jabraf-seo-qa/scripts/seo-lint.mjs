@@ -2,9 +2,14 @@
 // seo-lint: deterministic SEO/QA checks over a built static site (no dependencies).
 //
 // Usage:
-//   node seo-lint.mjs <output_dir> [--config seo.config.yaml] [--only /blog/my-post/] [--json]
+//   node seo-lint.mjs <output_dir> [--config seo.config.yaml] [--only /blog/my-post/]
+//                     [--base-dist <base build dir>] [--json]
 //
 // Exit code 1 if any error. Warnings never fail.
+// Reading grade over audience.reading_level_max_grade is an error. With --base-dist (the same site
+// built from the base ref), a page that also exists there is a refresh: it passes when at least 1.5
+// grades below its base grade, and the report names both grades. Pages missing from the base build
+// are new and always held to the cap.
 // Content pages (matching content.url_pattern) also get reading-level, banned-phrase and
 // internal-link checks; every page gets the basic head checks.
 // Part of Jabran's SEO loop (jabranr/skills, skills/jabraf-seo-qa). Site settings come from the
@@ -93,14 +98,90 @@ export function parseYaml(text) {
   return root;
 }
 
+// ---------- reading level ----------
+const decode = (s) =>
+  s
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&#x27;|&apos;/g, "'")
+    .replace(/&mdash;|&#8212;|&#x2014;/g, '—');
+
+function mainText(html) {
+  const main =
+    html.match(/<(main|article)\b[^>]*>([\s\S]*?)<\/\1>/i)?.[2] ??
+    html.match(/<body\b[^>]*>([\s\S]*)<\/body>/i)?.[1] ??
+    html;
+  return decode(
+    main
+      .replace(/<(script|style|pre|code|svg|noscript|nav|footer|header)\b[\s\S]*?<\/\1>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+  )
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function syllables(word) {
+  const w = word.toLowerCase().replace(/[^a-z]/g, '');
+  if (!w) return 0;
+  if (w.length <= 3) return 1;
+  const m = w
+    .replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '')
+    .replace(/^y/, '')
+    .match(/[aeiouy]{1,2}/g);
+  return Math.max(1, m ? m.length : 1);
+}
+
+export function fkGrade(text) {
+  const sentences = text.split(/[.!?]+(?=\s|$)/).filter((s) => s.trim().split(/\s+/).length > 2);
+  const words = text.split(/\s+/).filter((w) => /[a-z]/i.test(w));
+  if (sentences.length < 5 || words.length < 100) return null;
+  const syl = words.reduce((n, w) => n + syllables(w), 0);
+  return 0.39 * (words.length / sentences.length) + 11.8 * (syl / words.length) - 15.59;
+}
+
+/**
+ * Flesch-Kincaid grade of a built page's main text, or null when the text is too short to judge.
+ */
+export function readingGrade(html) {
+  return fkGrade(mainText(html));
+}
+
+/**
+ * The reading-grade rule. A page over `maxGrade` fails, unless it is a refresh (`baseGrade` is the
+ * same page's grade on the base build) that lands at least 1.5 grades below the base, so old pages
+ * above the cap can come down a step at a time. `baseGrade` undefined means a new page or no base
+ * build; null means the base page was too short to grade, so the cap applies. Returns `{ error }`,
+ * `{ warning }` (passes, naming both grades) or `{}`.
+ */
+export function gradeVerdict({ grade, baseGrade, maxGrade }) {
+  if (grade === null || grade === undefined || grade <= maxGrade) return {};
+  const now = `reading grade ${grade.toFixed(1)} (> ${maxGrade})`;
+  if (baseGrade === undefined) return { error: now };
+  if (baseGrade === null) return { error: `${now}, base not measurable` };
+  const both = `${now}, base ${baseGrade.toFixed(1)}`;
+  // Compare the rounded figures the report shows, so 12.0 → 10.5 passes as it reads.
+  const drop = Math.round(baseGrade * 10) - Math.round(grade * 10);
+  return drop >= 15
+    ? { warning: `${both}: refresh lowers it ${(drop / 10).toFixed(1)} grades, passes` }
+    : { error: `${both}: a refresh must reach ${maxGrade} or drop 1.5 grades` };
+}
+
 function main(args) {
   const flag = (name) => {
     const i = args.indexOf(name);
     return i >= 0 ? args[i + 1] : undefined;
   };
-  const outDir = args.find((a, i) => !a.startsWith('--') && !['--config', '--only'].includes(args[i - 1]));
-  if (!outDir || !existsSync(outDir)) {
-    console.error('usage: seo-lint.mjs <output_dir> [--config seo.config.yaml] [--only <path>] [--json]');
+  const outDir = args.find(
+    (a, i) => !a.startsWith('--') && !['--config', '--only', '--base-dist'].includes(args[i - 1])
+  );
+  const baseDist = flag('--base-dist');
+  if (!outDir || !existsSync(outDir) || (baseDist !== undefined && !existsSync(baseDist))) {
+    console.error(
+      'usage: seo-lint.mjs <output_dir> [--config seo.config.yaml] [--only <path>] [--base-dist <dir>] [--json]'
+    );
     process.exit(2);
   }
   const configPath = flag('--config') ?? (existsSync('seo.config.yaml') ? 'seo.config.yaml' : undefined);
@@ -144,51 +225,11 @@ function main(args) {
   }
 
   // ---------- helpers ----------
-  const decode = (s) =>
-    s
-      .replace(/&nbsp;/g, ' ')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;|&#x27;|&apos;/g, "'")
-      .replace(/&mdash;|&#8212;|&#x2014;/g, '—');
   const attr = (tag, name) => {
     const m = tag.match(new RegExp(`\\s${name}\\s*=\\s*("([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i'));
     return m ? decode(m[2] ?? m[3] ?? m[4] ?? '') : undefined;
   };
   const tags = (html, name) => html.match(new RegExp(`<${name}\\b[^>]*>`, 'gi')) ?? [];
-  function mainText(html) {
-    const main =
-      html.match(/<(main|article)\b[^>]*>([\s\S]*?)<\/\1>/i)?.[2] ??
-      html.match(/<body\b[^>]*>([\s\S]*)<\/body>/i)?.[1] ??
-      html;
-    return decode(
-      main
-        .replace(/<(script|style|pre|code|svg|noscript|nav|footer|header)\b[\s\S]*?<\/\1>/gi, ' ')
-        .replace(/<[^>]+>/g, ' ')
-    )
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-  function syllables(word) {
-    const w = word.toLowerCase().replace(/[^a-z]/g, '');
-    if (!w) return 0;
-    if (w.length <= 3) return 1;
-    const m = w
-      .replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '')
-      .replace(/^y/, '')
-      .match(/[aeiouy]{1,2}/g);
-    return Math.max(1, m ? m.length : 1);
-  }
-  function fkGrade(text) {
-    const sentences = text.split(/[.!?]+(?=\s|$)/).filter((s) => s.trim().split(/\s+/).length > 2);
-    const words = text.split(/\s+/).filter((w) => /[a-z]/i.test(w));
-    if (sentences.length < 5 || words.length < 100) return null;
-    const syl = words.reduce((n, w) => n + syllables(w), 0);
-    return 0.39 * (words.length / sentences.length) + 11.8 * (syl / words.length) - 15.59;
-  }
-
   // ---------- checks ----------
   const results = [];
   for (const file of files) {
@@ -271,7 +312,11 @@ function main(args) {
       const lower = text.toLowerCase();
       for (const p of banned) if (p && lower.includes(p.toLowerCase())) errors.push(`banned phrase: "${p}"`);
       const grade = fkGrade(text);
-      if (grade !== null && grade > maxGrade) errors.push(`reading grade ${grade.toFixed(1)} (> ${maxGrade})`);
+      const baseFile = baseDist && join(baseDist, relative(outDir, file));
+      const baseGrade = baseFile && existsSync(baseFile) ? readingGrade(readFileSync(baseFile, 'utf8')) : undefined;
+      const verdict = gradeVerdict({ grade, baseGrade, maxGrade });
+      if (verdict.error) errors.push(verdict.error);
+      if (verdict.warning) warnings.push(verdict.warning);
       const main = html.match(/<(main|article)\b[^>]*>([\s\S]*?)<\/\1>/i)?.[2] ?? html;
       const hrefs = tags(main, 'a').map((a) => attr(a, 'href') ?? '');
       const internal = new Set(

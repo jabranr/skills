@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { pageRules, pagesToLint } from './seo-lint-changed.mjs';
+import { CONFIG, HARD, MEDIUM, writePage } from './seo-lint.fixtures.mjs';
 import { parseYaml } from './seo-lint.mjs';
 
 // A static site with pages at the repo root and in folders (the SecureCI layout).
@@ -105,4 +111,45 @@ test('parseYaml skips block scalars with chomping indicators', () => {
     );
     assert.deepEqual(cfg.goal.attribution, { how_to_query: '', first_touch_recorded: true }, indicator);
   }
+});
+
+const CHANGED = fileURLToPath(new URL('./seo-lint-changed.mjs', import.meta.url));
+
+/**
+ * A git repo whose PR branch refreshes blog/old.html (hard → medium, base build in base-dist/) and
+ * adds blog/new.html (medium, so over the cap).
+ */
+function prRepo() {
+  const dir = mkdtempSync(join(tmpdir(), 'seo-lint-changed-'));
+  const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'pipe' });
+  const config = `${CONFIG}\nseo_lint:\n  pages:\n    - { source: 'blog/{slug}.html', url: '/blog/{slug}/' }\n`;
+  writeFileSync(join(dir, 'seo.config.yaml'), config);
+  mkdirSync(join(dir, 'blog'));
+  writeFileSync(join(dir, 'blog/old.html'), 'hard');
+  git('init', '-q', '-b', 'main');
+  git('-c', 'user.name=t', '-c', 'user.email=t@t', 'add', '.');
+  git('-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'base');
+  git('checkout', '-qb', 'pr');
+  writeFileSync(join(dir, 'blog/old.html'), 'medium');
+  writeFileSync(join(dir, 'blog/new.html'), 'medium');
+  git('-c', 'user.name=t', '-c', 'user.email=t@t', 'add', '.');
+  git('-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'pr');
+  writePage(join(dir, 'base-dist'), 'old', HARD);
+  writePage(join(dir, 'dist'), 'old', MEDIUM);
+  writePage(join(dir, 'dist'), 'new', MEDIUM);
+  return (...args) => spawnSync(process.execPath, [CHANGED, ...args], { cwd: dir, encoding: 'utf8' });
+}
+
+test('seo-lint-changed --base-dist lets a refresh pass by dropping 1.5 grades but fails a new page', () => {
+  const res = prRepo()('main', '--config', 'seo.config.yaml', '--base-dist', 'base-dist');
+  assert.equal(res.status, 1, res.stdout);
+  assert.match(res.stdout, /\/blog\/old\/\n {2}⚠ reading grade [\d.]+ \(> 8\), base [\d.]+/);
+  assert.match(res.stdout, /\/blog\/new\/\n {2}✖ reading grade [\d.]+ \(> 8\)/);
+  assert.match(res.stdout, /2 page\(s\) checked, 1 failed/);
+});
+
+test('seo-lint-changed without --base-dist keeps the CI call working and holds pages to the cap', () => {
+  const res = prRepo()('main', '--config', 'seo.config.yaml');
+  assert.equal(res.status, 1, res.stdout);
+  assert.match(res.stdout, /2 page\(s\) checked, 2 failed/);
 });

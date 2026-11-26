@@ -26,16 +26,23 @@ keeps the base value.
 
 ## Diagnose, then act
 
-| Signal                                                         | Issue                                                                 |
-| -------------------------------------------------------------- | --------------------------------------------------------------------- |
-| High impressions, CTR below expected for its position          | `seo:refresh`: rewrite title and meta description (one change)        |
-| Average position 8 to 20 with real impressions                 | `seo:refresh`: expand with missing subtopics or PAA, better answer    |
-| Clicks down more than 30% against the previous period          | `seo:refresh`: compare the SERP now and then; update facts, freshness |
-| Ranks but converts poorly for its type                         | `seo:refresh`: CTA, intent match, link to a money page                |
-| Two URLs ranking for the same query                            | `seo:refresh`: merge and redirect, or differentiate                   |
-| Not indexed after 14 days, or "crawled, not indexed"           | `seo:technical`, or `seo:refresh` when thin or duplicate (say which)  |
-| URL variants (slash, `#`, `?`) or app or auth pages in results | `seo:technical`: canonicals, redirects, `noindex`                     |
-| Site-audit errors (broken links, missing meta, slow pages)     | `seo:technical`                                                       |
+| Signal                                                                   | Issue                                                                 |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| High impressions, CTR below expected for its position                    | `seo:refresh`: rewrite title and meta description (one change)        |
+| Average position 8 to 20 with real impressions                           | `seo:refresh`: expand with missing subtopics or PAA, better answer    |
+| Clicks down more than 30% against the previous period                    | `seo:refresh`: compare the SERP now and then; update facts, freshness |
+| Ranks but converts poorly for its type                                   | `seo:refresh`: CTA, intent match, link to a money page                |
+| Two URLs ranking for the same query                                      | `seo:refresh`: merge and redirect, or differentiate                   |
+| Not indexed after 14 days, or "crawled, not indexed"                     | `seo:technical`, or `seo:refresh` when thin or duplicate (say which)  |
+| URL variants (slash, `#`, `?`) or app or auth pages in results           | `seo:technical`: canonicals, redirects, `noindex`                     |
+| Site-audit errors (broken links, missing meta, slow pages)               | `seo:technical`                                                       |
+| Reading grade above `audience.reading_level_max_grade`, with impressions | `seo:refresh`: simplify (shorter sentences, plain words, keep facts)  |
+
+Reading grades come from a full-site run on the build output
+(`node scripts/seo-lint.mjs {build.output_dir} --config seo.config.yaml --json` after
+`build.build`, with `scripts/` from `jabraf-seo-qa`, loaded the same way). Rank those pages by impressions and open at
+most one simplify refresh a week, unless the effective `refreshes_per_week` leaves room after the
+other signals, so old pages come down to the cap over time.
 
 Favour refreshes on pages that already show demand. Leave pages changed in the last 21 days alone
 so Google can re-crawl them. Each refresh issue gets its body from `jabraf-seo-brief` in refresh

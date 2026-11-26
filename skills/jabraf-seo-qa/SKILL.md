@@ -19,7 +19,9 @@ and ref, skill name swapped) when you reach Publish.
 
 **Deterministic.** Build with `build.build`, then run
 `node scripts/seo-lint.mjs {build.output_dir} --config seo.config.yaml --only {url}`, where
-`scripts/` is this skill's directory. Any error fails.
+`scripts/` is this skill's directory. Any error fails. For a refresh, also build the PR's base
+(`git worktree add <tmp> origin/{github.base_branch}`, then `build.build` there) and add
+`--base-dist <tmp>/{build.output_dir}`, so the reading-grade rule below can compare against it.
 
 **Facts.** Every product claim traces to a file in `facts.sources` or a cited primary URL. Prices,
 limits, features, hours and areas match the source _today_. Nothing in `facts.forbidden_claims`,
@@ -30,7 +32,10 @@ real API or format (ids, endpoints, field names). Any doubt fails.
 intent and type. The unique value is there. It beats the top results on at least one clear
 dimension. Thin or generic fails.
 
-**Reader.** Reading level at or below `audience.reading_level_max_grade`; no banned phrases; sounds
+**Reader.** Reading level: a new page at or below `audience.reading_level_max_grade` (hard fail
+otherwise). A refresh passes when it is at or below the cap, or at least 1.5 grades below the base
+version, so a page that was already over the cap can come down in steps; report both grades
+(seo-lint's `reading grade X (> cap), base Y` line) in the QA comment. No banned phrases; sounds
 like `voice` and follows `voice.rules` and `voice.brand_name_rule`; direct openings, each point
 made once, plain confident sentences with no AI tone (stacked hedges, reflexive triplets, empty
 summaries).
@@ -107,9 +112,13 @@ still not live on `site.base_url` stay `seo:review`; the next run retries them.
 
 - [`scripts/seo-lint.mjs`](scripts/seo-lint.mjs): checks built HTML (title, description, one H1,
   canonical form, alt text, JSON-LD, and for content pages banned phrases, reading grade, internal
-  links, CTA link, word count). Errors exit 1; warnings never fail.
-- [`scripts/seo-lint-changed.mjs`](scripts/seo-lint-changed.mjs): `<base-ref> [--config] [--out]`;
-  lints only the pages changed since the base ref, mapped through `seo_lint.pages` (or
-  `content.*`). Used in CI; see `jabraf-seo-setup` for the pinned fetch step.
+  links, CTA link, word count). Errors exit 1; warnings never fail. `--base-dist <dir>` (the site
+  built from the base ref) applies the refresh rule to reading grade: a page also in the base
+  build passes when 1.5 or more grades below its base grade (a warning naming both); pages missing
+  there are new and held to the cap. Without it, every page is held to the cap.
+- [`scripts/seo-lint-changed.mjs`](scripts/seo-lint-changed.mjs):
+  `<base-ref> [--config] [--out] [--base-dist]`; lints only the pages changed since the base ref,
+  mapped through `seo_lint.pages` (or `content.*`), passing `--base-dist` on to seo-lint. Used in
+  CI; see `jabraf-seo-setup` for the pinned fetch step.
 
 Both need Node 18 or newer and no dependencies. Tests: `npm test` in `jabranr/skills`.
