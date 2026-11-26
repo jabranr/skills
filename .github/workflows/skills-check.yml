@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Test skill scripts
+        run: npm test
+
       - name: Check skills index is up to date
         run: npm run --silent skills:index:check
 

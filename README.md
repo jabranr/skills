@@ -40,7 +40,25 @@ skills/
   jabraf-workflows-integration/SKILL.md
   jabraf-workflows-wait-cf-pages/SKILL.md
   jabraf-workflows-performance-audit/SKILL.md
+
+  # Jabran's SEO loop (scheduled tasks + OpenSEO MCP; each site keeps only seo.config.yaml)
+  jabraf-seo-setup/SKILL.md            # onboarding, schedules, migration from old kit copies
+    seo.config.example.yaml            # every config key the loop reads
+    templates/seo-labels.json          # GitHub labels for the loop
+  jabraf-seo-research/SKILL.md         # weekly: opportunities -> seo:brief issues
+  jabraf-seo-brief/SKILL.md            # one opportunity -> writer brief
+    templates/                         # seo:brief and seo:refresh issue templates
+  jabraf-seo-writer/SKILL.md           # issue -> branch -> draft PR
+  jabraf-seo-qa/SKILL.md               # review, merge gates, promote, publish
+    scripts/seo-lint*.mjs              # zero-dependency lint for built HTML (npm test)
+  jabraf-seo-publish/SKILL.md          # live check, IndexNow, close issues
+  jabraf-seo-audit/SKILL.md            # weekly: existing pages -> seo:refresh / seo:technical
+  jabraf-seo-conversion/SKILL.md       # monthly: conversions -> research weights
 ```
+
+Scheduled tasks load the SEO loop skills pinned to a tag, e.g.
+`npx -y skills@1.5.12 use https://github.com/jabranr/skills/tree/seo-loop-v1/skills/jabraf-seo-research`;
+see `jabraf-seo-setup` for the schedules and the per-task prompt.
 
 ## Using `jabraf-ground-rules` in a project
 

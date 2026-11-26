@@ -1,0 +1,144 @@
+# seo.config.yaml: per-repo settings for Jabran's SEO loop (the jabraf-seo-* skills in jabranr/skills).
+# Copy to the repo root. jabraf-seo-setup fills most of it from the codebase and asks for the rest.
+# Everything site-specific lives here, never in the skills. Business memory (overview, positioning,
+# voice, competitors) also lives in OpenSEO project context. Repo rules in AGENTS.md win over both.
+#
+# Parser note: seo-lint reads this file with a small YAML subset. Use `key: value`, nested maps,
+# `- item` lists indented under their key, inline `[a, b]` lists and inline `{ k: v }` maps.
+# Write a list of maps as `- { k: v, k2: v2 }` lines; `|` and `>` block scalars are fine.
+
+site:
+  name: Example Site
+  domain: example.com
+  base_url: https://example.com
+  trailing_slash: true # canonical URL form; true = /path/, false = /path. Audit flags the other form
+  market: { country: GB, language: en } # should match the OpenSEO project defaults
+
+openseo:
+  project_id: '' # from list_projects
+  weekly_credit_budget: 1500 # base budget; cadence.ramp can override it. Agents stop and ask before exceeding it
+  rank_tracker_id: '' # filled by jabraf-seo-setup
+
+github:
+  repo: owner/repo
+  base_branch: main
+  branch_prefix: seo/ # writer branches: seo/<issue-number>-<slug>
+  max_open_review_prs: 5 # research skips new briefs while this many seo:drafting/seo:review PRs are open
+
+auto_merge:
+  # jabraf-seo-qa squash-merges a passed PR only when every merge gate holds (QA passed on the head
+  # commit, CI green, mergeable, no unresolved threads or changes requested, every changed file in
+  # allowed_paths). Otherwise it labels the issue seo:needs-human. false = a human merges every PR.
+  enabled: false
+  method: squash # squash | merge | rebase
+  ci_wait_minutes: 20 # how long QA waits for pending CI before leaving the PR for the next run
+  allowed_paths: # globs; a PR touching any other file is never auto-merged
+    - 'src/content/**'
+    - 'public/images/**'
+  promote:
+    # Only for repos where a merge to base_branch deploys staging, and a workflow promotes to
+    # production. Leave enabled: false when a merge deploys production directly.
+    enabled: false
+    workflow: '' # workflow file to dispatch, e.g. promote-production.yml
+    workflow_inputs: { ref: '{sha}' } # dispatch inputs; {sha} becomes the merge commit SHA
+    staging_wait_minutes: 30 # wait for staging to be ready for the merge commit
+    staging_ready: '' # how to tell staging is ready, e.g. "CI on the merge commit passed and moved the release-candidate tag onto it"
+    run_timeout_minutes: 25 # wait for the dispatched run to finish
+    live_version_selector: '' # element on site.base_url whose content is the live commit SHA, e.g. meta[name="version"]
+
+publish:
+  deploy_wait_minutes: 10 # after a merge (or promotion), how long to wait for pages to go live before leaving them for the next run
+
+goal:
+  preset: saas # saas | local | content | personal (see jabraf-seo-setup, Goal presets)
+  north_star: activated_account # what success means for this project
+  conversion_events: [signup, activated] # names as recorded in your analytics or DB
+  proxy_event: cta_click # used until about 20 real conversions exist
+  attribution:
+    first_touch_recorded: false # true once first landing path + referrer are stored on conversions; jabraf-seo-conversion exits early while false
+    how_to_query: '' # e.g. "SQL on users.first_landing_path in D1" or "GET /api/admin/attribution"
+  cta:
+    primary_label: Get started free
+    primary_url: /signup
+    style: contextual # contextual | banner | inline
+
+audience:
+  who: '' # e.g. "indie devs and small agencies shipping static/JAMstack sites"
+  not_who: '' # wrong-audience traffic to avoid
+  pains: []
+  reading_level_max_grade: 8
+
+voice:
+  tone: plain, direct, friendly; no hype
+  person: we/you
+  banned_phrases: # seo-lint fails on these as case-insensitive substrings, so list no phrase that a correct negation contains
+    - '—' # em dash
+    - delve
+    - in today's fast-paced
+    - game-changer
+    - unlock the power
+    - seamless
+    - leverage
+    - it's important to note
+  brand_name_rule: '' # e.g. "First mention is 'Simple Signups (simple-signups.com)'"
+  rules: [] # copy rules QA enforces by reading, e.g. "Compliance copy says 'supports controls', never 'makes you compliant'"
+
+content:
+  # Where pages live and how to add one. The writer follows new_page_steps exactly.
+  format: mdx # md | mdx | tsx | html | astro | other
+  dir: src/content/blog
+  new_page_steps: |
+    1. Create src/content/blog/<slug>.mdx with the frontmatter shown in an existing post.
+    2. Nothing else; the sitemap and routes are generated.
+  url_pattern: /blog/{slug}/
+  page_types: [guide, comparison, use-case, how-to] # allowed types for briefs
+  min_words: 900
+  max_words: 2200
+  images: # where to get images; never invent screenshots of the product
+    source: 'repo screenshots in public/images or Playwright screenshots of the live site'
+    alt_text_required: true
+  internal_links_min: 3
+  must_link_to: [/pricing, /docs] # money pages every relevant page should link to
+
+facts:
+  # The ONLY sources for product facts. QA fails anything not traceable here or to a cited public URL.
+  sources:
+    - README.md
+    - docs/
+  forbidden_claims: [] # claims QA fails on sight, e.g. "makes you compliant", "#1", customer counts
+
+build:
+  install: npm ci
+  build: npm run build
+  output_dir: dist # seo-lint runs over this
+  test: npm test
+  lint: npm run lint
+  preview: npm run preview # optional, for screenshots
+
+seo_lint:
+  # Optional. Maps changed source files to URL paths for seo-lint-changed.mjs (first match wins).
+  # {slug} = one path segment, {path} = one or more, * = within a segment, ** = anything.
+  # url '' skips the file; url '*' lints the whole site (content kept in one shared file).
+  # Leave out when content.format is md, mdx, html, astro or markdoc with one file per page:
+  # the rule then comes from content.dir and content.url_pattern.
+  pages:
+    - { source: 'src/content/blog/{slug}.mdx', url: '/blog/{slug}/' }
+
+competitors: [] # domains; mirrored into OpenSEO context
+
+weights:
+  # Updated monthly by jabraf-seo-conversion (via PR). Research multiplies opportunity scores by these.
+  page_type: { guide: 1.0, comparison: 1.0, use-case: 1.0, how-to: 1.0 }
+  topic_cluster: {}
+
+cadence:
+  new_pages_per_week: 2
+  refreshes_per_week: 3
+  qa_max_rounds: 3
+  # Optional dated ramp. The entry with the latest `from` on or before today overrides
+  # new_pages_per_week, refreshes_per_week and openseo.weekly_credit_budget; a key it leaves out
+  # keeps the base value. new_pages_per_week: 0 makes research exit without spending credits,
+  # so a refresh-only start (audit, writer, QA) needs no research.
+  ramp:
+    - { from: 2026-12-01, new_pages_per_week: 0, refreshes_per_week: 2, weekly_credit_budget: 300 }
+    - { from: 2027-01-04, new_pages_per_week: 1, refreshes_per_week: 3, weekly_credit_budget: 800 }

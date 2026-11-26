@@ -1,0 +1,22 @@
+[
+  { "name": "seo:brief", "color": "0e8a16", "description": "New-page brief, ready for the SEO writer" },
+  { "name": "seo:refresh", "color": "1d76db", "description": "Improve an existing page (from the SEO audit)" },
+  {
+    "name": "seo:technical",
+    "color": "5319e7",
+    "description": "Technical SEO fix (canonicals, noindex, speed, attribution)"
+  },
+  { "name": "seo:drafting", "color": "fbca04", "description": "SEO writer has a draft PR open" },
+  { "name": "seo:qa-failed", "color": "d93f0b", "description": "SEO QA sent it back to the writer" },
+  {
+    "name": "seo:review",
+    "color": "c2e0c6",
+    "description": "SEO QA passed; waiting for the merge gates or a human merge"
+  },
+  {
+    "name": "seo:needs-human",
+    "color": "b60205",
+    "description": "Blocked on a fact or a merge gate, or failed SEO QA too often"
+  },
+  { "name": "seo:published", "color": "006b75", "description": "Merged, deployed and submitted for indexing" }
+]
