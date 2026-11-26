@@ -1,6 +1,6 @@
 ---
 name: jabraf-prettier
-description: Set up Prettier in a project using `@jabraf/dev`'s shared base config. Load when the user asks to add Prettier, set up code formatting, configure `.prettierrc`, or wire up `@jabraf/dev` Prettier specifically. Do not load for general formatter questions unrelated to `@jabraf/dev`.
+description: Set up Prettier in a project using `@jabraf/dev`'s shared base config, or fix/migrate a project on the legacy `@jabraf/prettier` config. Load when the user asks to add Prettier, set up code formatting, configure `.prettierrc`, wire up `@jabraf/dev` Prettier, or mentions `@jabraf/prettier`. Do not load for general formatter questions unrelated to `@jabraf/dev`.
 ---
 
 # `jabraf-prettier`
@@ -20,7 +20,7 @@ Load when the user's prompt mentions any of:
 
 - "Prettier", "code formatting", "format on save"
 - "`.prettierrc`", "`prettier.config`", "prettier setup"
-- "`@jabraf/dev` Prettier", "jabraf prettier"
+- "`@jabraf/dev` Prettier", "jabraf prettier", "`@jabraf/prettier`"
 
 Do not load for general "format my code" requests that don't imply Prettier or
 `@jabraf/dev`. Do not load alongside `jabraf-dev-setup` — the umbrella skill
@@ -41,7 +41,7 @@ require a user response before continuing.
    none exist, default to npm and mention it. If multiple exist, ask the user
    which to use. **[wait for user if ambiguous]**
 
-3. **Detect existing config.** Check for any of `.prettierrc`, `.prettierrc.{js,cjs,mjs,mts,json,yaml,yml,toml}`, `prettier.config.{js,cjs,mjs,mts}`, or a `prettier` field in `package.json`. If found, show the file contents (or the field) and ask: "An existing Prettier config was found. Replace with the `@jabraf/dev` re-export, leave it alone, or keep both side by side?" **[wait for user]** Never overwrite silently.
+3. **Detect existing config.** Check for any of `.prettierrc`, `.prettierrc.{js,cjs,mjs,mts,json,yaml,yml,toml}`, `prettier.config.{js,cjs,mjs,mts}`, or a `prettier` field in `package.json`. If the existing config is the legacy `@jabraf/prettier` (for example `"prettier": "@jabraf/prettier"`), also run the [legacy check](#legacy-jabrafprettier) below before asking. If found, show the file contents (or the field) and ask: "An existing Prettier config was found. Replace with the `@jabraf/dev` re-export, leave it alone, or keep both side by side?" **[wait for user]** Never overwrite silently.
 
 4. **Install `@jabraf/dev` if missing.** Check `package.json` `dependencies` and `devDependencies`. If `@jabraf/dev` is absent, install it as a dev dep using the detected package manager:
    - npm: `npm install --save-dev @jabraf/dev`
@@ -108,8 +108,29 @@ require a user response before continuing.
 | `package.json` `type` field is missing and you wrote `.prettierrc.mjs` | Confirm Node can load it (Node ≥ 14 with `.mjs` works regardless of `type`). No change needed; mention this in the final report.                |
 | Monorepo (`workspaces` field present)                                  | Ask whether to add Prettier at the repo root, in a specific workspace, or both. **[wait for user]** Repeat steps 3–7 in the chosen location(s). |
 | Existing `.prettierignore`                                             | Leave it alone. The `@jabraf/dev` base config does not ship a `.prettierignore`; the user's existing one stays in effect.                       |
+| Project uses legacy `@jabraf/prettier`                                 | Run the [legacy check](#legacy-jabrafprettier). Fix the Prettier version or migrate, per the user's choice. **[wait for user]**                 |
 | `@jabraf/dev` already pinned to an older version                       | Ask whether to upgrade to `latest`. **[wait for user]** Do not auto-upgrade.                                                                    |
 | Network/install failure                                                | Surface the package manager error verbatim and stop. Do not retry silently.                                                                     |
+
+## Legacy `@jabraf/prettier`
+
+`@jabraf/prettier` ([`jabranr/prettier-config`](https://github.com/jabranr/prettier-config)) is an older standalone config. It is not the `@jabraf/dev` base, and its defaults differ: `printWidth: 80` and `trailingComma: 'none'`. It ships an ES module config and needs **Prettier ≥ 3.4**. Older Prettier does not fail. It prints `Ignored unknown option { default: ... }` and formats with Prettier's defaults:
+
+- Prettier 2.x (e.g. `2.2.1`) can't load ES module configs.
+- Prettier 3.0–3.3 on Node ≥ 22.12 reads the module wrapper instead of the config.
+
+Versions up to 3.0.1 declared `prettier: "*"`, so npm reused whatever Prettier the project already had. From 3.1.0 it declares `prettier: ^3.4.0` as a peer dependency, so an older Prettier fails at install with `ERESOLVE`.
+
+When you find it:
+
+1. Run `npm ls prettier @jabraf/prettier` (or the pnpm/yarn equivalent) and report both versions.
+2. If Prettier is older than 3.4 or the warning above appears, tell the user the config is being ignored. Offer one of these:
+   - **Migrate** to `@jabraf/dev` (steps 4–7). This changes formatting to the `@jabraf/dev` base.
+   - **Keep** `@jabraf/prettier`: upgrade it and Prettier together with `npm install --save-dev prettier@^3.4.0 @jabraf/prettier@latest`.
+
+   **[wait for user]**
+
+3. Never change formatting style silently. Say that `format:check` will show diffs after either fix, because the config was not being applied before.
 
 ## Reference
 

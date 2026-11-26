@@ -568,7 +568,7 @@
         },
         {
           "name": "jabraf-prettier",
-          "when": "add Prettier with the `@jabraf/dev` base",
+          "when": "add Prettier with the `@jabraf/dev` base, or fix/migrate legacy `@jabraf/prettier`",
           "repo": "jabranr/skills",
           "path": "skills/jabraf-prettier"
         },
