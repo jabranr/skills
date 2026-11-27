@@ -1,6 +1,6 @@
 ---
 name: jabraf-ground-rules
-description: Jabran's ground rules for every project — how to work (clarify first, stay scoped, report real results) plus default stack (Cloudflare, Tailwind v4), TypeScript, testing, git/PR, gh, CI, security and docs conventions, and the cloud-session rules (git identity, main + subagents mode only when asked, model choices). Load at the start of any coding, repo, review, commit, PR or GitHub Actions task, and whenever a repo's AGENTS.md points to it or is silent on a convention.
+description: Jabran's ground rules for every project — how to work (clarify first, stay scoped, report real results), terse humanized responses, plus default stack (Cloudflare, Tailwind v4), TypeScript, testing, git/PR, gh, CI, security and docs conventions, and the cloud-session rules (git identity, main + subagents mode only when asked, model choices). Load at the start of any coding, repo, review, commit, PR or GitHub Actions task, and whenever a repo's AGENTS.md points to it or is silent on a convention.
 ---
 
 # `jabraf-ground-rules`
@@ -29,6 +29,17 @@ task touches a codebase. Section 11 applies in cloud sessions.
   source or `--help` output. When something is unclear, say so and ask.
 - **Match the surroundings.** New code reads like the code next to it: structure,
   naming, comment density. Comments explain _why_.
+
+### Responses (always)
+
+Applies to every reply, chats included.
+
+- **Concise.** Be extremely concise, to the point and accurate with facts.
+  Sacrifice grammar for the sake of concision.
+- **Humanize.** Then apply the `humanizer` skill
+  ([blader/humanizer](https://github.com/blader/humanizer)) to the reply. Load it
+  once per session; if it is not installed, load it through `jabraf-skills-index`.
+  Humanizer must not undo the concision above, and must not change facts.
 
 ## 2. Orient in the repo (first coding step)
 
@@ -345,19 +356,17 @@ These two points replace their section 6 counterparts in a cloud session:
 The setup script may set these variables. Use the value when one is set and the
 default when it is not.
 
-| Variable                        | Role                               | Default            |
-| ------------------------------- | ---------------------------------- | ------------------ |
-| `AGENT_MAIN_MODEL`              | Main agent                         | `claude-fable-5-2` |
-| `AGENT_MAIN_FALLBACK_MODEL`     | Main agent, when the first is down | `claude-opus-5-5`  |
-| `AGENT_SUBAGENT_MODEL`          | Every subagent                     | `claude-opus-5-5`  |
-| `AGENT_SUBAGENT_FALLBACK_MODEL` | Subagents, when the first is down  | `claude-haiku-5-5` |
+| Variable                        | Role                              | Default             |
+| ------------------------------- | --------------------------------- | ------------------- |
+| `AGENT_MAIN_MODEL`              | Main agent (no fallback)          | `claude-opus-5-5`   |
+| `AGENT_SUBAGENT_MODEL`          | Every subagent                    | `claude-sonnet-5-5` |
+| `AGENT_SUBAGENT_FALLBACK_MODEL` | Subagents, when the first is down | `claude-haiku-5-5`  |
 
 - **Main agent.** The harness picks the main model before these rules load, so
-  the two `AGENT_MAIN_*` variables only record what the setup script intended;
-  the setup script is what applies them, by mapping them onto the harness's own
-  model setting. Check which model is serving the session where the harness
-  lets you. If it is neither the main model nor its fallback, say so in your
-  first reply and carry on.
+  `AGENT_MAIN_MODEL` only records what the setup script intended; the setup
+  script is what applies it, by mapping it onto the harness's own model
+  setting. Check which model is serving the session where the harness lets
+  you. If it is not the main model, say so in your first reply and carry on.
 - **Subagents.** Applies only in main + subagents mode. Pass the subagent
   model explicitly on every spawn. When a spawn
   fails because that model is unavailable, retry once with the fallback and

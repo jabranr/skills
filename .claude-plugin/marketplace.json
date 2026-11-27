@@ -38,6 +38,11 @@
       "name": "unslop",
       "description": "Turns vibecoded, AI-looking UI into a designed interface with its own character",
       "source": { "source": "github", "repo": "heydamir/unslop" }
+    },
+    {
+      "name": "humanizer",
+      "description": "Rewrite AI-sounding text so it reads like the writer without changing what it says.",
+      "source": { "source": "github", "repo": "blader/humanizer" }
     }
   ]
 }

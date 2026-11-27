@@ -75,16 +75,15 @@ does not change the instructions of every later session until you move the pin.
 
 Variables the setup script can set:
 
-| Variable                        | Purpose                                        | Default            |
-| ------------------------------- | ---------------------------------------------- | ------------------ |
-| `AGENT_CLOUD_SESSION`           | `1` marks the session as a cloud session       | unset              |
-| `AGENT_MAIN_MODEL`              | Main agent model                               | `claude-fable-5-2` |
-| `AGENT_MAIN_FALLBACK_MODEL`     | Main agent model when the first is unavailable | `claude-opus-5-5`  |
-| `AGENT_SUBAGENT_MODEL`          | Subagent model (main + subagents mode only)    | `claude-opus-5-5`  |
-| `AGENT_SUBAGENT_FALLBACK_MODEL` | Subagent model when the first is unavailable   | `claude-haiku-5-5` |
+| Variable                        | Purpose                                      | Default             |
+| ------------------------------- | -------------------------------------------- | ------------------- |
+| `AGENT_CLOUD_SESSION`           | `1` marks the session as a cloud session     | unset               |
+| `AGENT_MAIN_MODEL`              | Main agent model (no fallback)               | `claude-opus-5-5`   |
+| `AGENT_SUBAGENT_MODEL`          | Subagent model (main + subagents mode only)  | `claude-sonnet-5-5` |
+| `AGENT_SUBAGENT_FALLBACK_MODEL` | Subagent model when the first is unavailable | `claude-haiku-5-5`  |
 
-The skill can only choose subagent models. The two `AGENT_MAIN_*` variables take
-effect only when the setup script also maps them onto the agent harness's own
+The skill can only choose subagent models. `AGENT_MAIN_MODEL` takes effect
+only when the setup script also maps it onto the agent harness's own
 model setting. Claude Code on the web is detected through `CLAUDE_CODE_REMOTE`
 and does not need `AGENT_CLOUD_SESSION`.
 
@@ -112,12 +111,14 @@ library in:
       "jabraf": { "source": { "source": "github", "repo": "jabranr/skills" } }
     },
     "enabledPlugins": {
-      "jabraf-skills@jabraf": true
+      "jabraf-skills@jabraf": true,
+      "humanizer@jabraf": true
     }
   }
   ```
 
-  Add more entries, such as `"searchfit-seo@jabraf": true`, for plugins whose
+  `humanizer` backs the always-on response rule in `jabraf-ground-rules`
+  section 1. Add more entries, such as `"searchfit-seo@jabraf": true`, for plugins whose
   agents or commands you want too.
 
 The index loads other skills over the network, so the environment's network

@@ -65,7 +65,11 @@ function repo(name) {
     branch: git('symbolic-ref', '--short', 'HEAD').trim(),
     files,
     has: (path) => files.includes(path) || files.some((f) => f.startsWith(`${path}/`)),
-    read: (path) => (files.includes(path) ? git('show', `HEAD:${path}`) : undefined),
+    // A skill at the repo root has dir '.', so its SKILL.md arrives as './SKILL.md'.
+    read: (path) => {
+      const file = path.replace(/^\.\//, '');
+      return files.includes(file) ? git('show', `HEAD:${file}`) : undefined;
+    },
     skills: files.filter((f) => f === 'SKILL.md' || f.endsWith('/SKILL.md')).map((f) => dirname(f)),
   };
   repos.set(name, r);
@@ -253,8 +257,9 @@ function renderCatalog() {
       if (!s.repo) throw new Error(`${s.name} has no source; run without --check to resolve it`);
       const branch = catalog.sources[s.repo]?.branch ?? 'main';
       const tag = s.plugin ? ` (plugin \`${s.plugin}\`)` : '';
+      const sub = s.path === '.' ? '' : `/${s.path}`;
       lines.push(
-        `- \`${s.name}\`${tag}: ${s.when.replace(/[.\s]+$/, '')}. \`https://github.com/${s.repo}/tree/${branch}/${s.path}\``
+        `- \`${s.name}\`${tag}: ${s.when.replace(/[.\s]+$/, '')}. \`https://github.com/${s.repo}/tree/${branch}${sub}\``
       );
     }
     lines.push('');

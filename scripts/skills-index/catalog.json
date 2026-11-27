@@ -37,6 +37,11 @@
       "source": { "source": "github", "repo": "heydamir/unslop" },
       "description": "Turns vibecoded, AI-looking UI into a designed interface with its own character",
       "extras": []
+    },
+    "humanizer": {
+      "source": { "source": "github", "repo": "blader/humanizer" },
+      "description": "Rewrite AI-sounding text so it reads like the writer without changing what it says.",
+      "extras": ["agents"]
     }
   },
   "sources": {
@@ -44,6 +49,7 @@
     "addyosmani/agent-skills": { "branch": "main" },
     "anthropics/claude-plugins-official": { "branch": "main" },
     "benjitaylor/skills": { "branch": "main" },
+    "blader/humanizer": { "branch": "main" },
     "cli/cli": { "branch": "trunk" },
     "emilkowalski/skills": { "branch": "main" },
     "heydamir/unslop": { "branch": "main" },
@@ -453,6 +459,13 @@
           "when": "the user asks for caveman mode, brevity or fewer tokens",
           "repo": "JuliusBrussee/caveman",
           "path": "skills/caveman"
+        },
+        {
+          "name": "humanizer",
+          "when": "strip AI tells from prose; run on every reply after the concise-response rule",
+          "repo": "blader/humanizer",
+          "path": ".",
+          "plugin": "humanizer"
         },
         {
           "name": "git-guardrails-claude-code",

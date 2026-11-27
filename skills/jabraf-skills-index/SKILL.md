@@ -166,6 +166,7 @@ Format: `name`: when to use it. `target`
 - `handoff` (plugin `mattpocock-skills`): compact the conversation into a handoff document for another agent. `https://github.com/mattpocock/skills/tree/main/skills/productivity/handoff`
 - `retro` (plugin `mattpocock-skills`): run a retrospective on a coding session. `https://github.com/mattpocock/skills/tree/main/skills/engineering/retro`
 - `caveman`: the user asks for caveman mode, brevity or fewer tokens. `https://github.com/JuliusBrussee/caveman/tree/main/skills/caveman`
+- `humanizer` (plugin `humanizer`): strip AI tells from prose; run on every reply after the concise-response rule. `https://github.com/blader/humanizer/tree/main`
 - `git-guardrails-claude-code` (plugin `mattpocock-skills`): add Claude Code hooks that block dangerous git commands. `https://github.com/mattpocock/skills/tree/main/skills/misc/git-guardrails-claude-code`
 - `wizard` (plugin `mattpocock-skills`): generate an interactive bash wizard for steps only a human can do. `https://github.com/mattpocock/skills/tree/main/skills/engineering/wizard`
 - `teach` (plugin `mattpocock-skills`): teach the user a new skill or concept inside this workspace. `https://github.com/mattpocock/skills/tree/main/skills/productivity/teach`
@@ -232,5 +233,6 @@ Format: `name`: when to use it. `target`
 These plugins also ship agents, commands, hooks or MCP servers. Their skills are listed above; for the rest, install the plugin in Claude Code with `/plugin install <plugin> --marketplace jabranr/skills`.
 
 - `searchfit-seo`: `agents`, `commands`
+- `humanizer`: `agents`
 
 <!-- catalog:end -->
